@@ -4,7 +4,7 @@ An Overwatch workshop mode for creating bots, showing team comps, and creating c
 There are 3 different modes:
 - Normal Play
 - Pick Heroes
-- Build Heroes
+- Build Heroes  
 To cycle through modes press `Interact` and `Ability 1 + Interact`  
 All keybinds were created with default keybinds in mind.  
 
