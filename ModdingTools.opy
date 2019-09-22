@@ -15,7 +15,10 @@
 #!define flyPosition P
 #!define heroMenu F
 #!define currHero G
+#!define abilities I
 #!define currTeam T
+#!define rayCastPosition Q
+#!define rayCastPlayer R
 
 # RULE: SETUP: Set global variables
 # TYPE: declaration
@@ -73,11 +76,13 @@ modes.append(vect(1,0,0))
 # PURPOSE: Setup player properties so each player is more like an object
 @Rule "SETUP: Set player properties"
 @Event eachPlayer
+@Team 1
 # Set player properties
 eventPlayer.mode = 0
 hudHeader(eventPlayer, "Play", Position.TOP, 0, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
 eventPlayer.menu = getLastCreatedText()
 eventPlayer.currTeam = Team.1
+eventPlayer.abilities = true
 
 # RULE: SETUP: Set bot properties
 # TYPE: declaration
@@ -144,14 +149,7 @@ if (eventPlayer.N[2] or not eventPlayer.N[0] and eventPlayer.N[1]):
     eventPlayer.setFacing(eventPlayer.N[3], Relativity.TO_WORLD)
     eventPlayer.startAcceleration(vect(getAllPlayers().index(eventPlayer) * 25, 500, 0) - eventPlayer.getPosition(), 10000, 12.8, Relativity.TO_WORLD, AccelReeval.DIRECTION_RATE_AND_MAX_SPEED)
     # Disable abilities
-    eventPlayer.disallowButton(Button.PRIMARY_FIRE)
-    eventPlayer.disallowButton(Button.SECONDARY_FIRE)
-    eventPlayer.disallowButton(Button.ABILITY_1)
-    eventPlayer.disallowButton(Button.ABILITY_2)
-    eventPlayer.disallowButton(Button.ULTIMATE)
-    eventPlayer.disallowButton(Button.INTERACT)
-    eventPlayer.disallowButton(Button.JUMP)
-    eventPlayer.disallowButton(Button.CROUCH)
+    eventPlayer.abilities = false
     # Set invincibility
     eventPlayer.N[5] = eventPlayer.hasStatusEffect(Status.INVINCIBLE)
     eventPlayer.setStatusEffect(null, Status.INVINCIBLE, 9999)
@@ -181,14 +179,7 @@ if (eventPlayer.N[2] or not eventPlayer.N[0] and eventPlayer.N[1]):
     eventPlayer.stopCamera()
     wait(1)
     # Turn abilities on
-    eventPlayer.allowButton(Button.PRIMARY_FIRE)
-    eventPlayer.allowButton(Button.SECONDARY_FIRE)
-    eventPlayer.allowButton(Button.ABILITY_1)
-    eventPlayer.allowButton(Button.ABILITY_2)
-    eventPlayer.allowButton(Button.ULTIMATE)
-    eventPlayer.allowButton(Button.INTERACT)
-    eventPlayer.allowButton(Button.JUMP)
-    eventPlayer.allowButton(Button.CROUCH)
+    eventPlayer.abilities = true
     # Reset activation condition
     lbl_1:
     eventPlayer.N[2] = false
@@ -231,6 +222,7 @@ if eventPlayer.currTeam == Team.2 and isGameInProgress() and eventPlayer.mode ==
 # PURPOSE: Go to the next mode on INTERACT
 @Rule "FUNCTION: Next Mode"
 @Event eachPlayer
+@Team 1
 # CONDITION: Player presses INTERACT while game is in progress
 if eventPlayer.isHoldingButton(Button.INTERACT) and not eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress():
     # set player mode
@@ -248,6 +240,7 @@ if eventPlayer.isHoldingButton(Button.INTERACT) and not eventPlayer.isHoldingBut
 # PURPOSE: Go to the prev mode on ABILITY 1 + INTERACT
 @Rule "FUNCTION: Prev Mode"
 @Event eachPlayer
+@Team 1
 # CONDITION: Player presses INTERACT while game is in progress
 if eventPlayer.isHoldingButton(Button.INTERACT) and eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress():
     # set player mode
@@ -258,8 +251,86 @@ if eventPlayer.isHoldingButton(Button.INTERACT) and eventPlayer.isHoldingButton(
     lbl_0:
     eventPlayer.mode = (len(modes) - 1)
     lbl_1:
-    wait(0.5, Wait.IGNORE_CONDITION)
+    wait(0.5, Wait.IGNORE_CONDITION) 
 
+# RULE: FUNCTION: Destroy bot on death
+# TYPE: function
+# PURPOSE: Destroys bot on death (may be replaced in the future that resets the bot to initial values)
+@Rule "FUNCTION: Destroy bot on death"
+@Event eachPlayer
+if eventPlayer.isDummy() and eventPlayer.isDead():
+    destroyDummy(eventPlayer.getTeam(), eventPlayer.getSlot())
+
+# RULE: MODE: Normal Play
+# TYPE: mode
+# PURPOSE: initialise normal play mode
+@Rule "MODE: Normal Play"
+@Event eachPlayer
+# CONDITION: Mode is set to 0
+if eventPlayer.mode == 0 and isGameInProgress():
+    #set HUD
+    destroyEffect(eventPlayer.cursor)
+    destroyHudText(eventPlayer.heroMenu)
+    destroyHudText(eventPlayer.menu)
+    hudHeader(eventPlayer, "Play", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
+    eventPlayer.menu = getLastCreatedText()
+    if not eventPlayer.N[1]:
+        goto lbl_0
+    eventPlayer.fly = true
+    goto lbl_1:
+    lbl_0:
+    lbl_1:
+    
+
+# RULE: MODE: Pick Heroes
+# TYPE: mode
+# PURPOSE: initialise pick heroes mode
+@Rule "MODE: Pick Heroes"
+@Event eachPlayer
+# CONDITION: Mode is set to 1
+if eventPlayer.mode == 1 and isGameInProgress():
+    #set HUD
+    destroyEffect(eventPlayer.cursor)
+    createEffect(eventPlayer,Effect.RING,Color.PURPLE,raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(),1,EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.cursor = getLastCreatedEntity()
+    destroyHudText(eventPlayer.menu)
+    hudHeader(eventPlayer, "Pick Heroes", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
+    eventPlayer.menu = getLastCreatedText()
+    if eventPlayer.N[1]:
+        goto lbl_0
+    eventPlayer.fly = true
+    goto lbl_1:
+    lbl_0:
+    lbl_1:
+    destroyHudText(eventPlayer.heroMenu)
+    hudText(eventPlayer, heroIcon(heroes[eventPlayer.currHero]), eventPlayer.currTeam, heroes[eventPlayer.currHero], Position.LEFT, 0, Color.BLUE, Color.BLUE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING)
+    eventPlayer.heroMenu = getLastCreatedText()
+    eventPlayer.rayCastPosition = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition()
+    eventPlayer.rayCastPlayer = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit()
+    
+# RULE: MODE: Behavior Builder
+# TYPE: mode
+# PURPOSE: initialise behavior builder mode
+@Rule "MODE: Behavior Builder"
+@Event eachPlayer
+# CONDITION: Mode is set to 2
+if eventPlayer.mode == 2 and isGameInProgress():
+    #set HUD
+    destroyEffect(eventPlayer.cursor)
+    destroyHudText(eventPlayer.menu)
+    createEffect(eventPlayer,Effect.RING,Color.PURPLE,raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(),1,EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.cursor = getLastCreatedEntity()
+    destroyHudText(eventPlayer.menu)
+    hudHeader(eventPlayer, "Build Heroes", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
+    eventPlayer.menu = getLastCreatedText()
+    if eventPlayer.N[1]:
+        goto lbl_0
+    eventPlayer.fly = true
+    goto lbl_1:
+    lbl_0:
+    lbl_1:
+
+# PICK HERO FUNCTIONS
 # RULE: FUNCTION: Previous Hero
 # TYPE: function
 # PURPOSE: Go to the prev hero on ULTIMATE
@@ -314,12 +385,14 @@ if eventPlayer.isHoldingButton(Button.ABILITY_2) and eventPlayer.isHoldingButton
 @Event eachPlayer
 # CONDITION: Player presses PRIMARY FIRE while game is in progress and mode is set to pick heroes
 if eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) and not eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress() and eventPlayer.mode == 1:
+    eventPlayer.rayCastPosition = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition()
+    eventPlayer.rayCastPlayer = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit()    
     if any([player.getCurrentHero() == heroes[eventPlayer.currHero] for player in getPlayers(eventPlayer.currTeam)]):
         goto lbl_0
-    createDummy(heroes[eventPlayer.currHero], eventPlayer.currTeam, -1, raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(), eventPlayer.getFacingDirection())
+    createDummy(heroes[eventPlayer.currHero], eventPlayer.currTeam, -1, eventPlayer.rayCastPosition, eventPlayer.getFacingDirection())
     goto lbl_1
     lbl_0:
-    getPlayersOnHero(eventPlayer.currTeam, heroes[eventPlayer.currHero]).teleport(raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition())
+    getPlayersOnHero(eventPlayer.currTeam, heroes[eventPlayer.currHero]).teleport(eventPlayer.rayCastPosition)
     lbl_1: 
 
 # RULE: FUNCTION: Select Hero
@@ -327,77 +400,52 @@ if eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) and not eventPlayer.isHoldin
 # PURPOSE: Select hero at cursor
 @Rule "FUNCTION: Select Hero"
 @Event eachPlayer
-# CONDITION: Player presses PRIMARY FIRE and ABILITY 1while game is in progress and mode is set to pick heroes
+# CONDITION: Player presses PRIMARY FIRE and ABILITY 1 while game is in progress and mode is set to pick heroes
 if eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) and eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress() and eventPlayer.mode == 1:
-    if all([hero != raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getCurrentHero() for hero in heroes]):
-        wait(0.25) # BUG: Compiler doesn't register this line 
-        eventPlayer.currTeam = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getTeam()
-        eventPlayer.currHero = heroes.index(raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getCurrentHero())
-    
+    eventPlayer.rayCastPosition = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition()
+    eventPlayer.rayCastPlayer = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit()    
+    if all([hero != eventPlayer.rayCastPlayer.getCurrentHero() for hero in heroes]):
+        wait(0.25) # BUG: Compiler doesn't register this line or the next?
+        eventPlayer.currTeam = eventPlayer.rayCastPlayer.getTeam()
+        eventPlayer.currHero = heroes.index(eventPlayer.rayCastPlayer.getCurrentHero())
 
-# RULE: MODE: Normal Play
-# TYPE: mode
-# PURPOSE: initialise normal play mode
-@Rule "MODE: Normal Play"
+# RULE: FUNCTION: Destroy Bot
+# TYPE: function
+# PURPOSE: Destroys bot when user uses ABILITY 1 and SECONDARY FIRE on a target
+@Rule "FUNCTION: Destroy Bot"
 @Event eachPlayer
-# CONDITION: Mode is set to 0
-if eventPlayer.mode == 0 and isGameInProgress():
-    #set HUD
-    destroyEffect(eventPlayer.cursor)
-    destroyHudText(eventPlayer.heroMenu)
-    destroyHudText(eventPlayer.menu)
-    hudHeader(eventPlayer, "Play", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
-    eventPlayer.menu = getLastCreatedText()
-    if not eventPlayer.N[1]:
-        goto lbl_0
-    eventPlayer.fly = true
-    goto lbl_1:
-    lbl_0:
-    lbl_1:
-    
+# CONDITION: Player presses SECONDARY FURE and ABILITY 1 while game is in progress and mode is set to pick heroes
+if eventPlayer.isHoldingButton(Button.SECONDARY_FIRE) and eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress() and eventPlayer.mode == 1:
+    eventPlayer.rayCastPosition = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition()
+    eventPlayer.rayCastPlayer = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit()    
+    destroyDummy(eventPlayer.rayCastPlayer.getTeam(),eventPlayer.rayCastPlayer.getSlot())
 
-# RULE: MODE: Pick Heroes
-# TYPE: mode
-# PURPOSE: initialise pick heroes mode
-@Rule "MODE: Pick Heroes"
+# RULE: FUNCTION: Disable Abilities
+# TYPE: function
+# PURPOSE: disables abilities on character
+@Rule "FUNCTION: Disable Abilities"
 @Event eachPlayer
-# CONDITION: Mode is set to 1
-if eventPlayer.mode == 1 and isGameInProgress():
-    #set HUD
-    destroyEffect(eventPlayer.cursor)
-    createEffect(eventPlayer,Effect.RING,Color.PURPLE,raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(),1,EffectReeval.POSITION_AND_RADIUS)
-    eventPlayer.cursor = getLastCreatedEntity()
-    destroyHudText(eventPlayer.menu)
-    hudHeader(eventPlayer, "Pick Heroes", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
-    eventPlayer.menu = getLastCreatedText()
-    if eventPlayer.N[1]:
-        goto lbl_0
-    eventPlayer.fly = true
-    goto lbl_1:
-    lbl_0:
-    lbl_1:
-    destroyHudText(eventPlayer.heroMenu)
-    hudText(eventPlayer, heroIcon(heroes[eventPlayer.currHero]), eventPlayer.currTeam, heroes[eventPlayer.currHero], Position.LEFT, 0, Color.BLUE, Color.BLUE, Color.WHITE, HudReeval.VISIBILITY_AND_STRING)
-    eventPlayer.heroMenu = getLastCreatedText()
-    
-# RULE: MODE: Behavior Builder
-# TYPE: mode
-# PURPOSE: initialise behavior builder mode
-@Rule "MODE: Behavior Builder"
+if eventPlayer.abilities == false and isGameInProgress():
+    eventPlayer.disallowButton(Button.PRIMARY_FIRE)
+    eventPlayer.disallowButton(Button.SECONDARY_FIRE)
+    eventPlayer.disallowButton(Button.ABILITY_1)
+    eventPlayer.disallowButton(Button.ABILITY_2)
+    eventPlayer.disallowButton(Button.ULTIMATE)
+    eventPlayer.disallowButton(Button.INTERACT)
+    eventPlayer.disallowButton(Button.JUMP)
+    eventPlayer.disallowButton(Button.CROUCH)
+
+# RULE: FUNCTION: Enable Abilities
+# TYPE: function
+# PURPOSE: enable abilities on character
+@Rule "FUNCTION: Disable Abilities"
 @Event eachPlayer
-# CONDITION: Mode is set to 2
-if eventPlayer.mode == 2 and isGameInProgress():
-    #set HUD
-    destroyEffect(eventPlayer.cursor)
-    destroyHudText(eventPlayer.menu)
-    createEffect(eventPlayer,Effect.RING,Color.PURPLE,raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(),1,EffectReeval.POSITION_AND_RADIUS)
-    eventPlayer.cursor = getLastCreatedEntity()
-    destroyHudText(eventPlayer.menu)
-    hudHeader(eventPlayer, "Build Heroes", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
-    eventPlayer.menu = getLastCreatedText()
-    if eventPlayer.N[1]:
-        goto lbl_0
-    eventPlayer.fly = true
-    goto lbl_1:
-    lbl_0:
-    lbl_1:
+if eventPlayer.abilities == true and isGameInProgress():
+    eventPlayer.allowButton(Button.PRIMARY_FIRE)
+    eventPlayer.allowButton(Button.SECONDARY_FIRE)
+    eventPlayer.allowButton(Button.ABILITY_1)
+    eventPlayer.allowButton(Button.ABILITY_2)
+    eventPlayer.allowButton(Button.ULTIMATE)
+    eventPlayer.allowButton(Button.INTERACT)
+    eventPlayer.allowButton(Button.JUMP)
+    eventPlayer.allowButton(Button.CROUCH)
