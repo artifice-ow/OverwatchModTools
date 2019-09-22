@@ -241,6 +241,7 @@ if eventPlayer.isHoldingButton(Button.INTERACT) and not eventPlayer.isHoldingBut
     lbl_0:
     eventPlayer.mode = 0
     lbl_1:
+    wait(0.5, Wait.IGNORE_CONDITION)
 
 # RULE: FUNCTION: Prev Mode
 # TYPE: function
@@ -257,7 +258,7 @@ if eventPlayer.isHoldingButton(Button.INTERACT) and eventPlayer.isHoldingButton(
     lbl_0:
     eventPlayer.mode = (len(modes) - 1)
     lbl_1:
-
+    wait(0.5, Wait.IGNORE_CONDITION)
 
 # RULE: FUNCTION: Previous Hero
 # TYPE: function
@@ -329,9 +330,9 @@ if eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) and not eventPlayer.isHoldin
 # CONDITION: Player presses PRIMARY FIRE and ABILITY 1while game is in progress and mode is set to pick heroes
 if eventPlayer.isHoldingButton(Button.PRIMARY_FIRE) and eventPlayer.isHoldingButton(Button.ABILITY_1) and isGameInProgress() and eventPlayer.mode == 1:
     if all([hero != raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getCurrentHero() for hero in heroes]):
-        
-        eventPlayer.currHero = heroes.index(raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getCurrentHero())
+        wait(0.25) # BUG: Compiler doesn't register this line 
         eventPlayer.currTeam = raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getTeam()
+        eventPlayer.currHero = heroes.index(raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getPlayerHit().getCurrentHero())
     
 
 # RULE: MODE: Normal Play
@@ -388,6 +389,7 @@ if eventPlayer.mode == 1 and isGameInProgress():
 if eventPlayer.mode == 2 and isGameInProgress():
     #set HUD
     destroyEffect(eventPlayer.cursor)
+    destroyHudText(eventPlayer.menu)
     createEffect(eventPlayer,Effect.RING,Color.PURPLE,raycast(eventPlayer.flyPosition, eventPlayer.flyPosition + eventPlayer.getFacingDirection() * 1000, include=getAllPlayers(), exclude=eventPlayer,includePlayerObjects=false).getHitPosition(),1,EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.cursor = getLastCreatedEntity()
     destroyHudText(eventPlayer.menu)
