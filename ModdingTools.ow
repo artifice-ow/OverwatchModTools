@@ -56,6 +56,7 @@ rule ("SETUP: Set player properties") {
         setPlayerVariable(eventPlayer, C, lastTextId);
         setPlayerVariable(eventPlayer, T, Team1);
         setPlayerVariable(eventPlayer, I, true);
+        setPlayerVariable(eventPlayer, J, eventPlayer);
     }
 }
 
@@ -467,6 +468,31 @@ rule ("FUNCTION: Place/Move Hero") {
     }
 }
 
+rule ("FUNCTION: Update Hero's Facing Direction") {
+    event {
+        ongoing-eachplayer;
+        all;
+        all;
+    }
+
+    conditions {
+        isButtonHeld(eventPlayer, SecondaryFire) == true;
+        isButtonHeld(eventPlayer, Ability1) == false;
+        isGameInProgress == true;
+        playerVariable(eventPlayer, A) == 1;
+    }
+
+    actions {
+        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, J, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)));
+        skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(currentArrayElement, ==, playerVariable(eventPlayer, J))), 2);
+        wait(0.1, IgnoreCondition);
+        skip(1);
+        setFacing(playerVariable(eventPlayer, J), directionTowards(eyePosition(playerVariable(eventPlayer, J)), playerVariable(eventPlayer, Q)), ToWorld);
+    }
+}
+
 rule ("FUNCTION: Select Hero") {
     event {
         ongoing-eachplayer;
@@ -484,11 +510,11 @@ rule ("FUNCTION: Select Hero") {
     actions {
         setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
         setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        skipIf(isTrueForAll(globalVariable(H), compare(currentArrayElement, !=, heroOf(playerVariable(eventPlayer, R)))), 2);
-        wait(0.1, IgnoreCondition);
-        skip(2);
+        skipIf(isTrueForAll(globalVariable(H), compare(currentArrayElement, !=, heroOf(playerVariable(eventPlayer, R)))), 3);
         setPlayerVariable(eventPlayer, T, teamOf(playerVariable(eventPlayer, R)));
         setPlayerVariable(eventPlayer, G, indexOfArrayValue(globalVariable(H), heroOf(playerVariable(eventPlayer, R))));
+        skip(1);
+        wait(0.1, IgnoreCondition);
     }
 }
 
