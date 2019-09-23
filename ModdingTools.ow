@@ -346,6 +346,8 @@ rule ("MODE: Pick Heroes") {
         destroyHudText(playerVariable(eventPlayer, F));
         createHudText(eventPlayer, heroIconString(valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), Left, 0, Blue, Blue, White, VisibleToAndString, Defaultvisibility);
         setPlayerVariable(eventPlayer, F, lastTextId);
+        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
     }
 }
 
@@ -456,10 +458,12 @@ rule ("FUNCTION: Place/Move Hero") {
     }
 
     actions {
+        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
         skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(heroOf(currentArrayElement), ==, valueInArray(globalVariable(H), playerVariable(eventPlayer, G)))), 2);
-        createDummyBot(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T), -1, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false), facingDirectionOf(eventPlayer));
+        createDummyBot(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T), -1, playerVariable(eventPlayer, Q), facingDirectionOf(eventPlayer));
         skip(1);
-        teleport(playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        teleport(playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), playerVariable(eventPlayer, Q));
     }
 }
 
@@ -478,8 +482,13 @@ rule ("FUNCTION: Select Hero") {
     }
 
     actions {
-        abortIf(isTrueForAll(globalVariable(H), compare(currentArrayElement, !=, heroOf(raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false)))));
-        setPlayerVariable(eventPlayer, G, indexOfArrayValue(globalVariable(H), heroOf(raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false))));
+        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        skipIf(isTrueForAll(globalVariable(H), compare(currentArrayElement, !=, heroOf(playerVariable(eventPlayer, R)))), 2);
+        wait(0.1, IgnoreCondition);
+        skip(2);
+        setPlayerVariable(eventPlayer, T, teamOf(playerVariable(eventPlayer, R)));
+        setPlayerVariable(eventPlayer, G, indexOfArrayValue(globalVariable(H), heroOf(playerVariable(eventPlayer, R))));
     }
 }
 
@@ -498,7 +507,9 @@ rule ("FUNCTION: Destroy Bot") {
     }
 
     actions {
-        destroyDummyBot(teamOf(raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false)), slotOf(raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false)));
+        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
+        destroyDummyBot(teamOf(playerVariable(eventPlayer, R)), slotOf(playerVariable(eventPlayer, R)));
     }
 }
 
