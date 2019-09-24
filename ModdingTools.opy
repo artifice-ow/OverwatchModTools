@@ -12,14 +12,15 @@
 #!define menu C
 #!define fly D
 #!define cursor E
-#!define flyPosition P
 #!define heroMenu F
 #!define currHero G
 #!define abilities I
-#!define currTeam T
+#!define currPlayer J
+#!define selection K
+#!define flyPosition P
 #!define rayCastPosition Q
 #!define rayCastPlayer R
-#!define currPlayer J
+#!define currTeam T
 
 # Function Macros
 
@@ -278,6 +279,7 @@ if eventPlayer.isDummy() and eventPlayer.isDead():
 if eventPlayer.mode == 0 and isGameInProgress():
     #set HUD
     destroyEffect(eventPlayer.cursor)
+    destroyEffect(eventPlayer.selection)
     destroyHudText(eventPlayer.heroMenu)
     destroyHudText(eventPlayer.menu)
     hudHeader(eventPlayer, "Play", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
@@ -289,7 +291,6 @@ if eventPlayer.mode == 0 and isGameInProgress():
     lbl_0:
     lbl_1:
     
-
 # RULE: MODE: Pick Heroes
 # TYPE: mode
 # PURPOSE: initialise pick heroes mode
@@ -301,6 +302,9 @@ if eventPlayer.mode == 1 and isGameInProgress():
     destroyEffect(eventPlayer.cursor)
     createEffect(eventPlayer,Effect.RING,Color.PURPLE,getRayCastPosition(),1,EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.cursor = getLastCreatedEntity()
+    destroyEffect(eventPlayer.selection)
+    createEffect(eventPlayer,Effect.RING,Color.GREEN, getPlayersOnHero(eventPlayer.currTeam, heroes[eventPlayer.currHero]), 1.5, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.selection = getLastCreatedEntity()
     destroyHudText(eventPlayer.menu)
     hudHeader(eventPlayer, "Pick Heroes", Position.TOP, 1, Color.PURPLE, HudReeval.VISIBILITY_AND_STRING)
     eventPlayer.menu = getLastCreatedText()
@@ -324,8 +328,11 @@ if eventPlayer.mode == 1 and isGameInProgress():
 # CONDITION: Mode is set to 2
 if eventPlayer.mode == 2 and isGameInProgress():
     #set HUD
+    destroyHudText(eventPlayer.heroMenu)
+    destroyEffect(eventPlayer.selection)
+    createEffect(eventPlayer,Effect.RING,Color.GREEN, getPlayersOnHero(eventPlayer.currTeam, heroes[eventPlayer.currHero]), 1.5, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.selection = getLastCreatedEntity()
     destroyEffect(eventPlayer.cursor)
-    destroyHudText(eventPlayer.menu)
     createEffect(eventPlayer,Effect.RING,Color.PURPLE,getRayCastPosition(),1,EffectReeval.POSITION_AND_RADIUS)
     eventPlayer.cursor = getLastCreatedEntity()
     destroyHudText(eventPlayer.menu)
@@ -385,6 +392,9 @@ if eventPlayer.isHoldingButton(Button.ABILITY_2) and eventPlayer.isHoldingButton
     lbl_0:
     eventPlayer.currTeam = Team.2
     lbl_1:
+    destroyEffect(eventPlayer.selection)
+    createEffect(eventPlayer,Effect.RING,Color.LIME_GREEN, getPlayersOnHero(eventPlayer.currTeam, heroes[eventPlayer.currHero]), 1.5, EffectReeval.POSITION_AND_RADIUS)
+    eventPlayer.selection = getLastCreatedEntity()
 
 # RULE: FUNCTION: Place/Move Hero
 # TYPE: function
