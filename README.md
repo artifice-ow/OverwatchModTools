@@ -1,4 +1,4 @@
-# OverwatchModTools v1.0 - 0S05G
+# OverwatchModTools v1.0 - JP628
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes.
 
 There are 3 different modes:
