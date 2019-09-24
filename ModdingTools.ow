@@ -312,6 +312,7 @@ rule ("MODE: Normal Play") {
 
     actions {
         destroyEffect(playerVariable(eventPlayer, E));
+        destroyEffect(playerVariable(eventPlayer, K));
         destroyHudText(playerVariable(eventPlayer, F));
         destroyHudText(playerVariable(eventPlayer, C));
         createHudText(eventPlayer, string("play", null, null, null), null, null, Top, 1, Purple, White, White, VisibleToAndString, Defaultvisibility);
@@ -338,6 +339,9 @@ rule ("MODE: Pick Heroes") {
         destroyEffect(playerVariable(eventPlayer, E));
         createEffect(eventPlayer, Ring, Purple, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false), 1, PositionAndRadius);
         setPlayerVariable(eventPlayer, E, lastCreatedEntity);
+        destroyEffect(playerVariable(eventPlayer, K));
+        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
+        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
         destroyHudText(playerVariable(eventPlayer, C));
         createHudText(eventPlayer, string("{0} {1}", string("pick", null, null, null), string("heroes", null, null, null), null), null, null, Top, 1, Purple, White, White, VisibleToAndString, Defaultvisibility);
         setPlayerVariable(eventPlayer, C, lastTextId);
@@ -365,8 +369,11 @@ rule ("MODE: Behavior Builder") {
     }
 
     actions {
+        destroyHudText(playerVariable(eventPlayer, F));
+        destroyEffect(playerVariable(eventPlayer, K));
+        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
+        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
         destroyEffect(playerVariable(eventPlayer, E));
-        destroyHudText(playerVariable(eventPlayer, C));
         createEffect(eventPlayer, Ring, Purple, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false), 1, PositionAndRadius);
         setPlayerVariable(eventPlayer, E, lastCreatedEntity);
         destroyHudText(playerVariable(eventPlayer, C));
@@ -441,6 +448,9 @@ rule ("FUNCTION: Change Team") {
         setPlayerVariable(eventPlayer, T, Team1);
         skip(1);
         setPlayerVariable(eventPlayer, T, Team2);
+        destroyEffect(playerVariable(eventPlayer, K));
+        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
+        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
     }
 }
 
@@ -461,11 +471,17 @@ rule ("FUNCTION: Place/Move Hero") {
     actions {
         setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
         setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(heroOf(currentArrayElement), ==, valueInArray(globalVariable(H), playerVariable(eventPlayer, G)))), 2);
+        skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(heroOf(currentArrayElement), ==, valueInArray(globalVariable(H), playerVariable(eventPlayer, G)))), 4);
         createDummyBot(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T), -1, playerVariable(eventPlayer, Q), facingDirectionOf(eventPlayer));
+        setPlayerVariable(playersOnHero(playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), B, 0);
+        playEffect(allPlayers(AllTeams), GoodAura, Green, positionOf(playerVariable(eventPlayer, R)), 1);
         skip(1);
         teleport(playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), playerVariable(eventPlayer, Q));
     }
+}
+
+actions {
+    playEffect(eventPlayer, GoodAura, Green, eventPlayer, 1);
 }
 
 rule ("FUNCTION: Update Hero's Facing Direction") {
