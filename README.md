@@ -1,4 +1,4 @@
-# OverwatchModTools
+# OverwatchModTools v1.0 - 0S05G
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes.
 
 There are 3 different modes:
@@ -22,6 +22,7 @@ Prev Hero - `Ultimate`
 
 Unused (As of now) - `Secondary Fire`, `Ability 1 + Ultimate`
 
+## (Planned for v1.1 release)
 ## Build Heroes
 This mode is for changing the behavior of heroes  
 Apply Behavior - `Primary Fire`  
