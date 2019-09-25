@@ -1,0 +1,272 @@
+// Global Variables
+define globalvar heroes;
+define globalvar modes;
+define globalvar behaviors;
+
+define globalvar flySpeed;
+define globalvar boostSpeed;
+define globalvar cameraSmoothing;
+
+// Player Variables
+define playervar mode;
+define playervar behavior;
+define playervar isFlying;
+define playervar hasAbilities;
+define playervar heroIndex;
+define playervar selectedHero;
+define playervar selectedTeam;
+define playervar selectedPlayer;
+define playervar flyPosition;
+define playervar facingDirection;
+define playervar hitPosition;
+define playervar hitPlayer;
+
+// Player HUD Items
+define playervar modeMenu;
+define playervar pickhHeroesMenu;
+define playervar buildHeroesMenu;
+
+// Player Effect Items
+define playervar cursor;
+define playervar selectionMarker;
+
+rule: "SETUP: Setup global variables"
+Event.OngoingGlobal
+{
+    //Set fly mode values
+    flySpeed = 20;
+    boostSpeed = 20;
+    cameraSmoothing = 60;
+
+    // Setup Heroes
+    heroes = [
+        //Tank Heroes
+        Hero.Dva, 
+        Hero.Orisa, 
+        Hero.Reinhardt, 
+        Hero.Roadhog, 
+        Hero.Sigma, 
+        Hero.Winston, 
+        Hero.WreckingBall, 
+        Hero.Zarya,
+        //Damage Heroes
+        Hero.Ashe,
+        Hero.Bastion,
+        Hero.Doomfist,
+        Hero.Genji,
+        Hero.Hanzo,
+        Hero.Junkrat,
+        Hero.Mccree,
+        Hero.Mei,
+        Hero.Pharah,
+        Hero.Reaper,
+        Hero.Soldier76,
+        Hero.Sombra,
+        Hero.Symmetra,
+        Hero.Torbjorn,
+        Hero.Tracer,
+        Hero.Widowmaker,
+        //Support Heroes
+        Hero.Ana,
+        Hero.Baptiste,
+        Hero.Brigitte,
+        Hero.Lucio,
+        Hero.Mercy,
+        Hero.Moira,
+        Hero.Zenyatta
+        ];
+    
+    // Setup Modes
+    modes = [
+        // Play Mode
+        new Mode(false, true),
+        // Pick Heroes Mode
+        new Mode(true, false),
+        // Build Heroes Mode
+        new Mode(true, false)
+    ];
+
+    // Setup Behaviors
+    behaviors = [];
+}
+
+rule: "SETUP: Set player properties"
+Event.OngoingPlayer
+{
+    mode = 0;
+    behavior = 0;
+    isFlying = (<Mode>modes[mode]).allowFlying;
+    hasAbilities = (<Mode>modes[mode]).allowAbilities;
+    heroIndex = 0;
+    selectedHero = heroes[heroIndex];
+    selectedTeam = Team.Team1;
+    selectedPlayer = PlayersOnHero(selectedHero, selectedTeam)[0];
+}
+
+rule: "SETUP: Skip assembly"
+Event.OngoingGlobal
+if (IsAssemblingHeroes())
+{
+    SetMatchTime(0);
+}
+
+rule: "SETUP: Skip setup"
+Event.OngoingGlobal
+if (IsInSetup())
+{
+    SetMatchTime(0);
+}
+
+rule: "FUNCTION: Switch Mode"
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
+{
+    define prevmode;
+    prevmode = EventPlayer().mode;
+    if(!IsButtonHeld(EventPlayer(), Button.Ability1))
+    {
+        if (EventPlayer().mode >= CountOf(modes) - 1)
+        {
+            EventPlayer().mode = 0;
+        }
+        else
+        {
+            EventPlayer().mode++;
+        }
+    }
+    else if (IsButtonHeld(EventPlayer(), Button.Ability1))
+    {
+        if (EventPlayer().mode <= 0)
+        {
+            EventPlayer().mode = CountOf(modes) - 1;
+        }
+        else
+        {
+            EventPlayer().mode--;
+        }
+    }
+
+    EventPlayer().hasAbilities = (<Mode>modes[EventPlayer().mode]).allowAbilities;
+    if (!EventPlayer().hasAbilities)
+    {
+        disableAbilities(EventPlayer());
+    }
+    else
+    {
+        enableAbilities(EventPlayer());
+    }
+    if ((<Mode>modes[EventPlayer().mode]).allowFlying != (<Mode>modes[prevmode]).allowFlying)
+    {
+        EventPlayer().isFlying = toggleFlying(EventPlayer(), EventPlayer().isFlying);
+    }
+    Wait(0.25);
+}
+
+rule: "MODE: Play Mode"
+Event.OngoingPlayer
+if (EventPlayer().mode == 0 && IsGameInProgress())
+{
+    DestroyAllHudText();
+    DestroyAllEffects();
+}
+
+rule: "MODE: Pick Heroes"
+Event.OngoingPlayer
+if (EventPlayer().mode == 1 && IsGameInProgress())
+{
+    DestroyAllHudText();
+    DestroyAllEffects();
+
+    CreateEffect(EventPlayer(), Effect.Ring, Color.Green, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
+    EventPlayer().cursor = LastCreatedEntity();
+
+}
+
+rule: "MODE: Build Heroes"
+Event.OngoingPlayer
+if (EventPlayer().mode == 2 && IsGameInProgress())
+{
+    DestroyAllHudText();
+    DestroyAllEffects();
+
+    CreateEffect(EventPlayer(),Effect.Ring, Color.Green, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
+    EventPlayer().cursor = LastCreatedEntity();
+
+}
+
+
+
+rule: "FUNCTION: Fly"
+Event.OngoingPlayer
+if (EventPlayer().isFlying && IsGameInProgress())
+{
+    while (EventPlayer().isFlying)
+    {
+        EventPlayer().facingDirection = FacingDirectionOf(EventPlayer());
+        EventPlayer().flyPosition = EventPlayer().flyPosition + (EventPlayer().facingDirection * Vector(ZOf(ThrottleOf(EventPlayer())), ZOf(ThrottleOf(EventPlayer())), ZOf(ThrottleOf(EventPlayer()))) + WorldVectorOf(Vector(1, 0, 0), EventPlayer(), LocalVector.Rotation) * Vector(XOf(ThrottleOf(EventPlayer())), XOf(ThrottleOf(EventPlayer())), XOf(ThrottleOf(EventPlayer()))) + Vector(0, IsButtonHeld(EventPlayer(), Button.Jump) * 1 + IsButtonHeld(EventPlayer(), Button.Crouch) * -1,0)) * Vector(0.4,0.4,0.4);
+        EventPlayer().hitPosition = RayCastHitPosition(flyPosition, flyPosition + facingDirection * 1000, AllPlayers(), EventPlayer(),false);
+        EventPlayer().hitPlayer = RayCastHitPlayer(flyPosition, flyPosition + facingDirection * 1000, AllPlayers(), EventPlayer(),false);
+    }
+}
+
+class Mode
+{
+    public define allowFlying;
+    public define allowAbilities;
+
+    public Mode(define setFlying, define setAbilities)
+    {
+        allowFlying = setFlying;
+        allowAbilities = setAbilities;
+    }
+    
+}
+
+method toggleFlying(define player, define flying)
+{
+    if (flying)
+    {
+        ClearStatus(player, Status.Invincible);
+        
+        StopCamera(player);
+
+        flying = false;
+    }
+    else if (!flying)
+    {
+        player.flyPosition = EyePosition(player);
+        player.facingDirection = FacingDirectionOf(player);
+        StartCamera(player, player.flyPosition, player.flyPosition + player.facingDirection, cameraSmoothing);
+
+        SetFacing(player, player.facingDirection,Relative.ToWorld);
+        SetStatus(player, null, Status.Invincible, 9999);
+
+        flying = true;
+    }
+    return flying;
+}
+
+method enableAbilities(define player)
+{
+
+    AllowButton(player, Button.PrimaryFire);
+    AllowButton(player, Button.SecondaryFire);
+    AllowButton(player, Button.Ability1);
+    AllowButton(player, Button.Ability2);
+    AllowButton(player, Button.Ultimate);
+    AllowButton(player, Button.Jump);
+    AllowButton(player, Button.Crouch);
+
+}
+
+method disableAbilities(define player)
+{
+    DisallowButton(player, Button.PrimaryFire);
+    DisallowButton(player, Button.SecondaryFire);
+    DisallowButton(player, Button.Ability1);
+    DisallowButton(player, Button.Ability2);
+    DisallowButton(player, Button.Ultimate);
+    DisallowButton(player, Button.Jump);
+    DisallowButton(player, Button.Crouch);
+
+}
