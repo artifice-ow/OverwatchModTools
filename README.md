@@ -1,4 +1,4 @@
-# OverwatchModTools v1.0
+# OverwatchModTools v1.0 - Y3R8A
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes written in Overwatch Script to Workshop.
 
 There are 3 different modes:
@@ -34,3 +34,7 @@ Select Hero | `Primary Fire`
 Next Behavior | `Ability 2`  
 Prev Behavior | `Ultimate`  
 Set Behavior | `Ability 1 + Ultimate`  
+
+## Planned Features
+- Save bots + behaviors for use in other gamemodes
+- Many more behaviors
