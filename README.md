@@ -1,10 +1,11 @@
-# OverwatchModTools v1.0 - 0S05G
-An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes.
+# OverwatchModTools v1.0
+An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes written in Overwatch Script to Workshop.
 
 There are 3 different modes:
 - Normal Play
 - Pick Heroes
-- Build Heroes  
+- Build Heroes
+
 To cycle through modes press `Interact` and `Ability 1 + Interact`  
 All keybinds were created with default keybinds in mind.  
 
