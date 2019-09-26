@@ -1,4 +1,4 @@
-# OverwatchModTools v1.0 - JP628
+# OverwatchModTools v0.1 - JP628
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes.
 
 There are 3 different modes:
@@ -21,12 +21,3 @@ Next Hero - `Ability 2`
 Prev Hero - `Ultimate`  
 
 Unused (As of now) - `Secondary Fire`, `Ability 1 + Ultimate`
-
-## (Planned for v1.1 release)
-## Build Heroes
-This mode is for changing the behavior of heroes  
-Apply Behavior - `Primary Fire`  
-Select Hero - `Ability 1 + Primary Fire`  
-Next Behavior - `Ability 2`  
-Prev Behavior - `Ultimate`  
-Save Hero - `Ability 1 + Ultimate`  
