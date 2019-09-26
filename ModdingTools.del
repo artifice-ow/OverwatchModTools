@@ -573,9 +573,72 @@ if (EventPlayer().behavior == 4 && IsDummyBot(EventPlayer()) && IsGameInProgress
     }
 }
 
+rule: "BEHAVIOR: ORISA: Deploy Shield on Cooldown"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 201 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    while(EventPlayer().behavior == 201)
+    {
+        PressButton(EventPlayer(), Button.Ability2);
+        Wait(10);
+    }
+}
+
 rule: "BEHAVIOR: REINHARDT: Shield Up"
 Event.OngoingPlayer
 if (EventPlayer().behavior == 301 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+}
+
+rule: "BEHAVIOR: SIGMA: Deploy Shield"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 501 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+    Wait(1.5);
+    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
+}
+
+rule: "BEHAVIOR: WINSTON: Deploy Bubble"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 601 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    while(EventPlayer().behavior == 601)
+    {
+        PressButton(EventPlayer(), Button.Ability2);
+        Wait(13);
+    }
+}
+
+rule: "BEHAVIOR: HAMMOND: Ball"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 701 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    PressButton(EventPlayer(), Button.Ability1);
+}
+
+rule: "BEHAVIOR: ZARYA: Personal Bubble"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 801 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    while(EventPlayer().behavior == 801)
+    {
+        PressButton(EventPlayer(), Button.Ability1);
+        Wait(10);
+    }
+}
+
+rule: "BEHAVIOR: BASTION: Sentry"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 1001 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    PressButton(EventPlayer(), Button.Ability1);
+}
+
+rule: "BEHAVIOR: BRIGITTE: Shield"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 2701 && IsDummyBot(EventPlayer()) && IsGameInProgress())
 {
     StartHoldingButton(EventPlayer(), Button.SecondaryFire);
 }

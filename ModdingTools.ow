@@ -1,605 +1,1221 @@
-rule ("SETUP: Set global variables") {
-    event {
-        ongoing-global;
-    }
+// --- Variable Guide ---
+// global A[0] INTERNAL : Multidimensional Array Builder
+// global A[1] INTERNAL : Class Indexes
+// global A[2] heroes
+// global A[3] modes
+// global A[4] behaviors
+// global A[5] flySpeed
+// global A[6] boostSpeed
+// global A[7] cameraSmoothing
+// player A[0] mode
+// player A[1] behavior
+// player A[2] isFlying
+// player A[3] hasAbilities
+// player A[4] heroIndex
+// player A[5] behaviorIndex
+// player A[6] selectedHero
+// player A[7] selectedTeam
+// player A[8] selectedPlayer
+// player A[9] flyPosition
+// player A[10] facingDirection
+// player A[11] hitPosition
+// player A[12] hitPlayer
+// player A[13] modeMenu
+// player A[14] pickHeroesMenu
+// player A[15] buildHeroesMenu
+// player A[16] cursor
+// player A[17] selectionMarker
+// player A[18] fixerEffect
+// global A[8] INTERNAL : New Mode class index
+// global A[9] setFlying
+// global A[10] setAbilities
+// global A[11] INTERNAL : New Mode class index
+// global A[12] setFlying
+// global A[13] setAbilities
+// global A[14] INTERNAL : New Mode class index
+// global A[15] setFlying
+// global A[16] setAbilities
+// player A[19] prevmode
+// player A[20] player
+// player A[21] player
+// player A[22] player
+// player A[23] flying
+// player A[24] INTERNAL : toggleFlying: return temp value
+// player A[25] INTERNAL : ContinueSkip
+// player A[26] INTERNAL : ContinueSkip temp holder
+// player A[27] INTERNAL : ContinueSkip
+// player A[28] INTERNAL : ContinueSkip temp holder
+// player A[29] INTERNAL : ContinueSkip
+// player A[30] INTERNAL : ContinueSkip temp holder
+// player A[31] strafeLength
+// player A[32] strafePosition
+// player A[33] INTERNAL : ContinueSkip
+// player A[34] INTERNAL : ContinueSkip temp holder
+// player A[35] strafeLength
+// player A[36] strafePosition
+// player A[37] INTERNAL : ContinueSkip
+// player A[38] INTERNAL : ContinueSkip temp holder
+// player A[39] strafeLength
+// player A[40] strafePosition
+// player A[41] INTERNAL : ContinueSkip
+// player A[42] INTERNAL : ContinueSkip temp holder
+// player A[43] strafeLength
+// player A[44] strafePosition
+// player A[45] INTERNAL : ContinueSkip
+// player A[46] INTERNAL : ContinueSkip temp holder
+// player A[47] INTERNAL : ContinueSkip
+// player A[48] INTERNAL : ContinueSkip temp holder
+// player A[49] INTERNAL : ContinueSkip
+// player A[50] INTERNAL : ContinueSkip temp holder
+// player A[51] INTERNAL : ContinueSkip
+// player A[52] INTERNAL : ContinueSkip temp holder
 
-    actions {
-        setGlobalVariable(H, emptyArray);
-        modifyGlobalVariable(H, AppendToArray, hero(D.va));
-        modifyGlobalVariable(H, AppendToArray, hero(WreckingBall));
-        modifyGlobalVariable(H, AppendToArray, hero(Orisa));
-        modifyGlobalVariable(H, AppendToArray, hero(Reinhardt));
-        modifyGlobalVariable(H, AppendToArray, hero(Roadhog));
-        modifyGlobalVariable(H, AppendToArray, hero(Sigma));
-        modifyGlobalVariable(H, AppendToArray, hero(Winston));
-        modifyGlobalVariable(H, AppendToArray, hero(Zarya));
-        modifyGlobalVariable(H, AppendToArray, hero(Ashe));
-        modifyGlobalVariable(H, AppendToArray, hero(Bastion));
-        modifyGlobalVariable(H, AppendToArray, hero(Doomfist));
-        modifyGlobalVariable(H, AppendToArray, hero(Genji));
-        modifyGlobalVariable(H, AppendToArray, hero(Hanzo));
-        modifyGlobalVariable(H, AppendToArray, hero(Junkrat));
-        modifyGlobalVariable(H, AppendToArray, hero(Mccree));
-        modifyGlobalVariable(H, AppendToArray, hero(Mei));
-        modifyGlobalVariable(H, AppendToArray, hero(Pharah));
-        modifyGlobalVariable(H, AppendToArray, hero(Reaper));
-        modifyGlobalVariable(H, AppendToArray, hero(Soldier:76));
-        modifyGlobalVariable(H, AppendToArray, hero(Sombra));
-        modifyGlobalVariable(H, AppendToArray, hero(Symmetra));
-        modifyGlobalVariable(H, AppendToArray, hero(Torbjörn));
-        modifyGlobalVariable(H, AppendToArray, hero(Tracer));
-        modifyGlobalVariable(H, AppendToArray, hero(Widowmaker));
-        modifyGlobalVariable(H, AppendToArray, hero(Ana));
-        modifyGlobalVariable(H, AppendToArray, hero(Baptiste));
-        modifyGlobalVariable(H, AppendToArray, hero(Brigitte));
-        modifyGlobalVariable(H, AppendToArray, hero(Lúcio));
-        modifyGlobalVariable(H, AppendToArray, hero(Mercy));
-        modifyGlobalVariable(H, AppendToArray, hero(Moira));
-        modifyGlobalVariable(H, AppendToArray, hero(Zenyatta));
-        setGlobalVariable(M, emptyArray);
-        modifyGlobalVariable(M, AppendToArray, vector(0, 1, 0));
-        modifyGlobalVariable(M, AppendToArray, vector(1, 0, 0));
-        modifyGlobalVariable(M, AppendToArray, vector(1, 0, 0));
-    }
+rule("INTERNAL : Initial Global Values")
+{
+
+	event
+	{
+		Ongoing - Global;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Set Global Variable At Index(A, 1, Empty Array);
+	}
 }
 
-rule ("SETUP: Set player properties") {
-    event {
-        ongoing-eachplayer;
-        team1;
-        all;
-    }
 
-    actions {
-        setPlayerVariable(eventPlayer, A, 0);
-        createHudText(eventPlayer, string("play", null, null, null), null, null, Top, 0, Purple, White, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, C, lastTextId);
-        setPlayerVariable(eventPlayer, T, Team1);
-        setPlayerVariable(eventPlayer, I, true);
-        setPlayerVariable(eventPlayer, J, eventPlayer);
-    }
+rule("SETUP: Setup global variables")
+{
+
+	event
+	{
+		Ongoing - Global;
+	}
+	
+	// Action count: 39
+	actions
+	{
+		Set Global Variable At Index(A, 5, 20);
+		Set Global Variable At Index(A, 6, 20);
+		Set Global Variable At Index(A, 7, 60);
+		Set Global Variable At Index(A, 2, Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Empty Array, Hero(D.va)), Hero(Orisa)), Hero(Reinhardt)), Hero(Roadhog)), Hero(Sigma)), Hero(Winston)), Hero(Wrecking Ball)), Hero(Zarya)), Hero(Ashe)), Hero(Bastion)), Hero(Doomfist)), Hero(Genji)), Hero(Hanzo)), Hero(Junkrat)), Hero(Mccree)), Hero(Mei)), Hero(Pharah)), Hero(Reaper)), Hero(Soldier: 76)), Hero(Sombra)), Hero(Symmetra)), Hero(Torbjörn)), Hero(Tracer)), Hero(Widowmaker)), Hero(Ana)), Hero(Baptiste)), Hero(Brigitte)), Hero(Lúcio)), Hero(Mercy)), Hero(Moira)), Hero(Zenyatta)));
+		Set Global Variable At Index(A, 8, Value In Array(Append To Array(Append To Array(Empty Array, Subtract(Count Of(Global Variable(C)), 1)), Subtract(First Of(Filtered Array(Sorted Array(Value In Array(Global Variable(A), 1), Current Array Element), And(Not(Array Contains(Value In Array(Global Variable(A), 1), Subtract(Current Array Element, 1))), Compare(Current Array Element, !=, 0)))), 1)), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Count Of(Value In Array(Global Variable(A), 1)), !=, 0))));
+		Set Global Variable At Index(A, 8, Value In Array(Append To Array(Append To Array(Empty Array, Value In Array(Global Variable(A), 8)), Count Of(Global Variable(C))), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Value In Array(Global Variable(A), 8), ==, -1))));
+		Set Global Variable At Index(A, 1, Append To Array(Value In Array(Global Variable(A), 1), Value In Array(Global Variable(A), 8)));
+		Set Global Variable At Index(A, 9, False);
+		Set Global Variable At Index(A, 10, True);
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 8)));
+		Set Global Variable At Index(B, 0, Value In Array(Global Variable(A), 9));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 8), Global Variable(B));
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 8)));
+		Set Global Variable At Index(B, 1, Value In Array(Global Variable(A), 10));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 8), Global Variable(B));
+		Set Global Variable At Index(A, 11, Value In Array(Append To Array(Append To Array(Empty Array, Subtract(Count Of(Global Variable(C)), 1)), Subtract(First Of(Filtered Array(Sorted Array(Value In Array(Global Variable(A), 1), Current Array Element), And(Not(Array Contains(Value In Array(Global Variable(A), 1), Subtract(Current Array Element, 1))), Compare(Current Array Element, !=, 0)))), 1)), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Count Of(Value In Array(Global Variable(A), 1)), !=, 0))));
+		Set Global Variable At Index(A, 11, Value In Array(Append To Array(Append To Array(Empty Array, Value In Array(Global Variable(A), 11)), Count Of(Global Variable(C))), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Value In Array(Global Variable(A), 11), ==, -1))));
+		Set Global Variable At Index(A, 1, Append To Array(Value In Array(Global Variable(A), 1), Value In Array(Global Variable(A), 11)));
+		Set Global Variable At Index(A, 12, True);
+		Set Global Variable At Index(A, 13, False);
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 11)));
+		Set Global Variable At Index(B, 0, Value In Array(Global Variable(A), 12));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 11), Global Variable(B));
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 11)));
+		Set Global Variable At Index(B, 1, Value In Array(Global Variable(A), 13));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 11), Global Variable(B));
+		Set Global Variable At Index(A, 14, Value In Array(Append To Array(Append To Array(Empty Array, Subtract(Count Of(Global Variable(C)), 1)), Subtract(First Of(Filtered Array(Sorted Array(Value In Array(Global Variable(A), 1), Current Array Element), And(Not(Array Contains(Value In Array(Global Variable(A), 1), Subtract(Current Array Element, 1))), Compare(Current Array Element, !=, 0)))), 1)), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Count Of(Value In Array(Global Variable(A), 1)), !=, 0))));
+		Set Global Variable At Index(A, 14, Value In Array(Append To Array(Append To Array(Empty Array, Value In Array(Global Variable(A), 14)), Count Of(Global Variable(C))), Index Of Array Value(Append To Array(Append To Array(Empty Array, False), True), Compare(Value In Array(Global Variable(A), 14), ==, -1))));
+		Set Global Variable At Index(A, 1, Append To Array(Value In Array(Global Variable(A), 1), Value In Array(Global Variable(A), 14)));
+		Set Global Variable At Index(A, 15, True);
+		Set Global Variable At Index(A, 16, False);
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 14)));
+		Set Global Variable At Index(B, 0, Value In Array(Global Variable(A), 15));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 14), Global Variable(B));
+		Set Global Variable(B, Value In Array(Global Variable(C), Value In Array(Global Variable(A), 14)));
+		Set Global Variable At Index(B, 1, Value In Array(Global Variable(A), 16));
+		Set Global Variable At Index(C, Value In Array(Global Variable(A), 14), Global Variable(B));
+		Set Global Variable At Index(A, 3, Append To Array(Append To Array(Append To Array(Empty Array, Value In Array(Global Variable(A), 8)), Value In Array(Global Variable(A), 11)), Value In Array(Global Variable(A), 14)));
+		Set Global Variable At Index(A, 4, Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Empty Array, 0), 1), 2), 3), 4), 201), 301), 501), 601), 701), 801), 1001), 2701));
+	}
 }
 
-rule ("SETUP: Set bot properties") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isDummyBot(eventPlayer) == true;
-    }
+rule("SETUP: Set player properties")
+{
 
-    actions {
-        setPlayerVariable(eventPlayer, B, 0);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	// Action count: 9
+	actions
+	{
+		Set Player Variable At Index(Event Player, A, 0, 0);
+		Set Player Variable At Index(Event Player, A, 1, 0);
+		Set Player Variable At Index(Event Player, A, 2, Value In Array(Value In Array(Global Variable(C), Value In Array(Value In Array(Global Variable(A), 3), Value In Array(Player Variable(Event Player, A), 0))), 0));
+		Set Player Variable At Index(Event Player, A, 3, Value In Array(Value In Array(Global Variable(C), Value In Array(Value In Array(Global Variable(A), 3), Value In Array(Player Variable(Event Player, A), 0))), 1));
+		Set Player Variable At Index(Event Player, A, 4, 0);
+		Set Player Variable At Index(Event Player, A, 5, 0);
+		Set Player Variable At Index(Event Player, A, 6, Value In Array(Value In Array(Global Variable(A), 2), Value In Array(Player Variable(Event Player, A), 4)));
+		Set Player Variable At Index(Event Player, A, 7, Team(Team1));
+		Set Player Variable At Index(Event Player, A, 8, Value In Array(Players On Hero(Value In Array(Player Variable(Event Player, A), 6), Value In Array(Player Variable(Event Player, A), 7)), 0));
+	}
 }
 
-rule ("SETUP: NoClip Properties") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    actions {
-        setGlobalVariableAtIndex(N, 0, vector(1, 1, 0));
-        setGlobalVariableAtIndex(N, 1, vector(20, 20, 60));
-        setPlayerVariableAtIndex(eventPlayer, N, 0, compare(xComponentOf(firstOf(globalVariable(N))), ==, 1));
-    }
+rule("SETUP: Skip assembly")
+{
+
+	event
+	{
+		Ongoing - Global;
+	}
+	
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Set Match Time(0);
+	}
 }
 
-rule ("SETUP: Skip assembly") {
-    event {
-        ongoing-global;
-    }
 
-    conditions {
-        isAssemblingHeroes == true;
-    }
+rule("SETUP: Skip setup")
+{
 
-    actions {
-        setMatchTime(0);
-    }
+	event
+	{
+		Ongoing - Global;
+	}
+	
+	conditions
+	{
+		Is In Setup == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Set Match Time(0);
+	}
 }
 
-rule ("SETUP: Skip setup") {
-    event {
-        ongoing-global;
-    }
 
-    conditions {
-        isInSetup == true;
-    }
+rule("FUNCTION: Switch Mode")
+{
 
-    actions {
-        setMatchTime(0);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Is Button Held(Event Player, Interact), Is Game In Progress) == True;
+	}
+	
+	// Action count: 58
+	actions
+	{
+		Set Player Variable At Index(Event Player, A, 19, Value In Array(Player Variable(Event Player, A), 0));
+		Skip If(Not(Not(Is Button Held(Event Player, Ability1))), 5);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 0), >=, Subtract(Count Of(Value In Array(Global Variable(A), 3)), 1))), 2);
+		Set Player Variable At Index(Event Player, A, 0, 0);
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 0, Add(Value In Array(Player Variable(Event Player, A), 0), 1));
+		Skip(5);
+		Skip If(Not(Is Button Held(Event Player, Ability1)), 4);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 0), <=, 0)), 2);
+		Set Player Variable At Index(Event Player, A, 0, Subtract(Count Of(Value In Array(Global Variable(A), 3)), 1));
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 0, Subtract(Value In Array(Player Variable(Event Player, A), 0), 1));
+		Set Player Variable At Index(Event Player, A, 3, Value In Array(Value In Array(Global Variable(C), Value In Array(Value In Array(Global Variable(A), 3), Value In Array(Player Variable(Event Player, A), 0))), 1));
+		Skip If(Not(Not(Value In Array(Player Variable(Event Player, A), 3))), 9);
+		Set Player Variable At Index(Event Player, A, 20, Event Player);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Primary Fire);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Secondary Fire);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Ability1);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Ability2);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Ultimate);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Jump);
+		Disallow Button(Value In Array(Player Variable(Event Player, A), 20), Crouch);
+		Skip(9);
+		Set Player Variable At Index(Event Player, A, 21, Event Player);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Primary Fire);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Secondary Fire);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Ability2);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Ultimate);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Jump);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Crouch);
+		Wait(0.3, Ignore Condition);
+		Allow Button(Value In Array(Player Variable(Event Player, A), 21), Ability1);
+		Skip If(Not(Compare(Value In Array(Value In Array(Global Variable(C), Value In Array(Value In Array(Global Variable(A), 3), Value In Array(Player Variable(Event Player, A), 0))), 0), !=, Value In Array(Value In Array(Global Variable(C), Value In Array(Value In Array(Global Variable(A), 3), Value In Array(Player Variable(Event Player, A), 19))), 0))), 24);
+		Set Player Variable At Index(Event Player, A, 22, Event Player);
+		Set Player Variable At Index(Event Player, A, 23, Value In Array(Player Variable(Event Player, A), 2));
+		Skip If(Not(Value In Array(Player Variable(Event Player, A), 23)), 7);
+		Clear Status(Value In Array(Player Variable(Event Player, A), 22), Invincible);
+		Stop Camera(Value In Array(Player Variable(Event Player, A), 22));
+		Teleport(Value In Array(Player Variable(Event Player, A), 22), Value In Array(Player Variable(Event Player, A), 9));
+		Set Gravity(Value In Array(Player Variable(Event Player, A), 22), 100);
+		Stop Accelerating(Value In Array(Player Variable(Event Player, A), 22));
+		Set Player Variable At Index(Event Player, A, 23, False);
+		Skip(10);
+		Skip If(Not(Not(Value In Array(Player Variable(Event Player, A), 23))), 9);
+		Set Player Variable At Index(Value In Array(Player Variable(Event Player, A), 22), A, 9, Eye Position(Value In Array(Player Variable(Event Player, A), 22)));
+		Set Player Variable At Index(Value In Array(Player Variable(Event Player, A), 22), A, 10, Facing Direction Of(Value In Array(Player Variable(Event Player, A), 22)));
+		Start Camera(Value In Array(Player Variable(Event Player, A), 22), Value In Array(Player Variable(Value In Array(Player Variable(Event Player, A), 22), A), 9), Add(Value In Array(Player Variable(Value In Array(Player Variable(Event Player, A), 22), A), 9), Value In Array(Player Variable(Value In Array(Player Variable(Event Player, A), 22), A), 10)), Value In Array(Global Variable(A), 7));
+		Set Facing(Value In Array(Player Variable(Event Player, A), 22), Value In Array(Player Variable(Value In Array(Player Variable(Event Player, A), 22), A), 10), To World);
+		Set Status(Value In Array(Player Variable(Event Player, A), 22), Null, Invincible, 9999);
+		Teleport(Value In Array(Player Variable(Event Player, A), 22), Vector(X Component Of(Value In Array(Player Variable(Event Player, A), 22)), Add(Y Component Of(Value In Array(Player Variable(Event Player, A), 22)), 3000), Z Component Of(Value In Array(Player Variable(Event Player, A), 22))));
+		Set Gravity(Value In Array(Player Variable(Event Player, A), 22), 0);
+		Start Accelerating(Value In Array(Player Variable(Event Player, A), 22), Vector(0, 1, 0), 100, 1.4, To World, None);
+		Set Player Variable At Index(Event Player, A, 23, True);
+		Set Player Variable At Index(Event Player, A, 24, Value In Array(Player Variable(Event Player, A), 23));
+		Skip(1);
+		Skip(-1);
+		Set Player Variable At Index(Event Player, A, 2, Value In Array(Player Variable(Event Player, A), 24));
+		Wait(0.25, Ignore Condition);
+	}
 }
 
-rule ("FUNCTION: NoClip Activator") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        firstOf(playerVariable(eventPlayer, N)) == true;
-        playerVariable(eventPlayer, D) == true;
-    }
+rule("MODE: Play Mode")
+{
 
-    actions {
-        setPlayerVariableAtIndex(eventPlayer, N, 2, true);
-        setPlayerVariable(eventPlayer, D, false);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 0), Is Game In Progress) == True;
+	}
+	
+	// Action count: 8
+	actions
+	{
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 15));
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 17));
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 14));
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 16));
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 13));
+		Wait(0.016, Ignore Condition);
+		Create Hud Text(Event Player, String("play", Null, Null, Null), Null, Null, Top, 1, White, White, White, String, Visible Never);
+		Set Player Variable At Index(Event Player, A, 13, Last Text ID);
+	}
 }
 
-rule ("FUNCTION: NoClip Toggle") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        or(valueInArray(playerVariable(eventPlayer, N), 2), and(not(firstOf(playerVariable(eventPlayer, N))), valueInArray(playerVariable(eventPlayer, N), 1))) == true;
-    }
+rule("MODE: Pick Heroes")
+{
 
-    actions {
-        setPlayerVariableAtIndex(eventPlayer, N, 1, not(valueInArray(playerVariable(eventPlayer, N), 1)));
-        skipIf(not(valueInArray(playerVariable(eventPlayer, N), 1)), 10);
-        setPlayerVariable(eventPlayer, P, eyePosition(eventPlayer));
-        startCamera(eventPlayer, playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), facingDirectionOf(eventPlayer)), zComponentOf(valueInArray(globalVariable(N), 1)));
-        setPlayerVariableAtIndex(eventPlayer, N, 3, facingDirectionOf(eventPlayer));
-        teleport(eventPlayer, vector(multiply(indexOfArrayValue(allPlayers(AllTeams), eventPlayer), 25), 500, 0));
-        setFacing(eventPlayer, valueInArray(playerVariable(eventPlayer, N), 3), ToWorld);
-        startAccelerating(eventPlayer, subtract(vector(multiply(indexOfArrayValue(allPlayers(AllTeams), eventPlayer), 25), 500, 0), positionOf(eventPlayer)), 10000, 12.8, ToWorld, DirectionRateAndMaxSpeed);
-        setPlayerVariable(eventPlayer, I, false);
-        setPlayerVariableAtIndex(eventPlayer, N, 5, hasStatus(eventPlayer, Invincible));
-        setStatus(eventPlayer, null, Invincible, 9999);
-        chasePlayerVariableAtRate(eventPlayer, P, add(playerVariable(eventPlayer, P), add(multiply(facingDirectionOf(eventPlayer), multiply(1000, zComponentOf(throttleOf(eventPlayer)))), multiply(add(multiply(worldVectorOf(left, eventPlayer, Rotation), xComponentOf(throttleOf(eventPlayer))), vector(0, add(multiply(isButtonHeld(eventPlayer, Jump), 1), multiply(isButtonHeld(eventPlayer, Crouch), -1)), 0)), 1000))), add(multiply(xComponentOf(valueInArray(globalVariable(N), 1)), not(isButtonHeld(eventPlayer, Ability1))), multiply(yComponentOf(valueInArray(globalVariable(N), 1)), isButtonHeld(eventPlayer, Ability1))), DestinationAndRate);
-        skipIf(valueInArray(playerVariable(eventPlayer, N), 1), 13);
-        stopAccelerating(eventPlayer);
-        applyImpulse(eventPlayer, multiply(velocityOf(eventPlayer), multiply(-1, multiply(0.001, multiply(0.001, multiply(0.001, multiply(0.001, multiply(0.001, 0.001))))))), 1, ToWorld, CancelContraryMotion);
-        wait(0.032, IgnoreCondition);
-        applyImpulse(eventPlayer, multiply(velocityOf(eventPlayer), multiply(-1, multiply(0.001, multiply(0.001, multiply(0.001, multiply(0.001, multiply(0.001, 0.001))))))), 1, ToWorld, CancelContraryMotion);
-        setPlayerVariableAtIndex(eventPlayer, N, 3, facingDirectionOf(eventPlayer));
-        teleport(eventPlayer, subtract(playerVariable(eventPlayer, P), subtract(eyePosition(eventPlayer), positionOf(eventPlayer))));
-        stopChasingPlayerVariable(eventPlayer, P);
-        setFacing(eventPlayer, valueInArray(playerVariable(eventPlayer, N), 3), ToWorld);
-        skipIf(valueInArray(playerVariable(eventPlayer, N), 5), 1);
-        clearStatus(eventPlayer, Invincible);
-        stopCamera(eventPlayer);
-        wait(1, IgnoreCondition);
-        setPlayerVariable(eventPlayer, I, true);
-        setPlayerVariableAtIndex(eventPlayer, N, 2, false);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1), Is Game In Progress) == True;
+	}
+	
+	// Action count: 18
+	actions
+	{
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 15));
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 13));
+		Wait(0.016, Ignore Condition);
+		Create Hud Text(Event Player, String("{0} {1}", String("pick", Null, Null, Null), String("heroes", Null, Null, Null), Null), Null, Null, Top, 1, Blue, White, White, String, Visible Never);
+		Set Player Variable At Index(Event Player, A, 13, Last Text ID);
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 14));
+		Create Hud Text(Event Player, Hero Icon String(Value In Array(Player Variable(Event Player, A), 6)), Value In Array(Player Variable(Event Player, A), 7), Value In Array(Player Variable(Event Player, A), 6), Top, 2, Blue, Blue, White, String, Visible Never);
+		Set Player Variable At Index(Event Player, A, 14, Last Text ID);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 16));
+		Create Effect(Event Player, Ring, Blue, Value In Array(Player Variable(Event Player, A), 11), 1, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 16, Last Created Entity);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 17));
+		Create Effect(Event Player, Ring, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 17, Last Created Entity);
+		Skip If(Not(Or(Compare(Value In Array(Player Variable(Event Player, A), 18), ==, 0), Compare(Value In Array(Player Variable(Event Player, A), 18), ==, Null))), 3);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 18));
+		Create Effect(Event Player, Orb, Blue, Value In Array(Player Variable(Event Player, A), 11), 1, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 18, Last Created Entity);
+	}
 }
 
-rule ("FUNCTION: NoClip Bug Workaround") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        valueInArray(playerVariable(eventPlayer, N), 1) == true;
-        or(compare(throttleOf(eventPlayer), !=, vector(0, 0, 0)), or(isButtonHeld(eventPlayer, Jump), isButtonHeld(eventPlayer, Crouch))) == true;
-    }
+rule("MODE: Build Heroes")
+{
 
-    actions {
-        wait(0.1, AbortWhenFalse);
-        setPlayerVariableAtIndex(eventPlayer, N, 6, throttleOf(eventPlayer));
-        loop;
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2), Is Game In Progress) == True;
+	}
+	
+	// Action count: 18
+	actions
+	{
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 14));
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 13));
+		Wait(0.016, Ignore Condition);
+		Create Hud Text(Event Player, String("{0} {1}", String("build", Null, Null, Null), String("heroes", Null, Null, Null), Null), Null, Null, Top, 1, Orange, White, White, String, Visible Never);
+		Set Player Variable At Index(Event Player, A, 13, Last Text ID);
+		Destroy Hud Text(Value In Array(Player Variable(Event Player, A), 15));
+		Create Hud Text(Event Player, Hero Icon String(Hero Of(Value In Array(Player Variable(Event Player, A), 8))), String("{0} {1}", String("selected", Null, Null, Null), String("ability", Null, Null, Null), Null), Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)), Top, 2, Orange, Orange, White, String, Visible Never);
+		Set Player Variable At Index(Event Player, A, 15, Last Text ID);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 16));
+		Create Effect(Event Player, Ring, Orange, Value In Array(Player Variable(Event Player, A), 11), 1, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 16, Last Created Entity);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 17));
+		Create Effect(Event Player, Ring, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 17, Last Created Entity);
+		Skip If(Not(Or(Compare(Value In Array(Player Variable(Event Player, A), 18), ==, 0), Compare(Value In Array(Player Variable(Event Player, A), 18), ==, Null))), 3);
+		Destroy Effect(Value In Array(Player Variable(Event Player, A), 18));
+		Create Effect(Event Player, Orb, Blue, Value In Array(Player Variable(Event Player, A), 11), 1, Position And Radius);
+		Set Player Variable At Index(Event Player, A, 18, Last Created Entity);
+	}
 }
 
-rule ("FUNCTION: Update HeroMenu HUD Color Team 1") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, T) == Team1;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("FUNCTION: Fly")
+{
 
-    actions {
-        destroyHudText(playerVariable(eventPlayer, F));
-        createHudText(eventPlayer, heroIconString(valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), Left, 0, Blue, Blue, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, F, lastTextId);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Value In Array(Player Variable(Event Player, A), 2), Is Game In Progress) == True;
+	}
+	
+	// Action count: 13
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 25), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 26, Value In Array(Player Variable(Event Player, A), 25));
+		Set Player Variable At Index(Event Player, A, 25, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 26));
+		Skip If(Not(Value In Array(Player Variable(Event Player, A), 2)), 6);
+		Set Player Variable At Index(Event Player, A, 10, Facing Direction Of(Event Player));
+		Set Player Variable At Index(Event Player, A, 9, Add(Value In Array(Player Variable(Event Player, A), 9), Multiply(Add(Add(Multiply(Value In Array(Player Variable(Event Player, A), 10), Vector(Z Component Of(Throttle Of(Event Player)), Z Component Of(Throttle Of(Event Player)), Z Component Of(Throttle Of(Event Player)))), Multiply(World Vector Of(Vector(1, 0, 0), Event Player, Rotation), Vector(X Component Of(Throttle Of(Event Player)), X Component Of(Throttle Of(Event Player)), X Component Of(Throttle Of(Event Player))))), Vector(0, Add(Multiply(Is Button Held(Event Player, Jump), 1), Multiply(Is Button Held(Event Player, Crouch), -1)), 0)), Vector(0.4, 0.4, 0.4))));
+		Set Player Variable At Index(Event Player, A, 11, Ray Cast Hit Position(Value In Array(Player Variable(Event Player, A), 9), Add(Value In Array(Player Variable(Event Player, A), 9), Multiply(Value In Array(Player Variable(Event Player, A), 10), 1000)), All Players(Team(All)), Event Player, False));
+		Set Player Variable At Index(Event Player, A, 12, Ray Cast Hit Player(Value In Array(Player Variable(Event Player, A), 9), Add(Value In Array(Player Variable(Event Player, A), 9), Multiply(Value In Array(Player Variable(Event Player, A), 10), 1000)), All Players(Team(All)), Event Player, False));
+		Set Player Variable At Index(Event Player, A, 25, 0);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 25, 0);
+	}
 }
 
-rule ("FUNCTION: Update HeroMenu HUD Color Team 2") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, T) == Team2;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("PICK HEROES: Cycle Heroes - Forward")
+{
 
-    actions {
-        destroyHudText(playerVariable(eventPlayer, F));
-        createHudText(eventPlayer, heroIconString(valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), Left, 0, Red, Red, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, F, lastTextId);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ability2), Is Game In Progress), Not(Is Button Held(Event Player, Ability1))), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 5
+	actions
+	{
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 4), >=, Subtract(Count Of(Value In Array(Global Variable(A), 2)), 1))), 2);
+		Set Player Variable At Index(Event Player, A, 4, 0);
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 4, Add(Value In Array(Player Variable(Event Player, A), 4), 1));
+		Set Player Variable At Index(Event Player, A, 6, Value In Array(Value In Array(Global Variable(A), 2), Value In Array(Player Variable(Event Player, A), 4)));
+	}
 }
 
-rule ("FUNCTION: Next Mode") {
-    event {
-        ongoing-eachplayer;
-        team1;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, Interact) == true;
-        isButtonHeld(eventPlayer, Ability1) == false;
-        isGameInProgress == true;
-    }
+rule("PICK HEROES: Cycle Heroes - Back")
+{
 
-    actions {
-        skipIf(compare(playerVariable(eventPlayer, A), >=, subtract(countOf(globalVariable(M)), 1)), 2);
-        modifyPlayerVariable(eventPlayer, A, Add, 1);
-        skip(1);
-        setPlayerVariable(eventPlayer, A, 0);
-        wait(0.5, IgnoreCondition);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ultimate), Is Game In Progress), Not(Is Button Held(Event Player, Ability1))), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 5
+	actions
+	{
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 4), <=, 0)), 2);
+		Set Player Variable At Index(Event Player, A, 4, Subtract(Count Of(Value In Array(Global Variable(A), 2)), 1));
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 4, Subtract(Value In Array(Player Variable(Event Player, A), 4), 1));
+		Set Player Variable At Index(Event Player, A, 6, Value In Array(Value In Array(Global Variable(A), 2), Value In Array(Player Variable(Event Player, A), 4)));
+	}
 }
 
-rule ("FUNCTION: Prev Mode") {
-    event {
-        ongoing-eachplayer;
-        team1;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, Interact) == true;
-        isButtonHeld(eventPlayer, Ability1) == true;
-        isGameInProgress == true;
-    }
+rule("PICK HEROES: Place Heroes")
+{
 
-    actions {
-        skipIf(compare(playerVariable(eventPlayer, A), <=, 0), 2);
-        modifyPlayerVariable(eventPlayer, A, Subtract, 1);
-        skip(1);
-        setPlayerVariable(eventPlayer, A, subtract(countOf(globalVariable(M)), 1));
-        wait(0.5, IgnoreCondition);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Primary Fire), Is Button Held(Event Player, Ability1)), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 7
+	actions
+	{
+		Skip If(Not(Compare(Count Of(All Players(Value In Array(Player Variable(Event Player, A), 7))), <, 6)), 6);
+		Create Dummy Bot(Value In Array(Player Variable(Event Player, A), 6), Value In Array(Player Variable(Event Player, A), 7), -1, Value In Array(Player Variable(Event Player, A), 11), Facing Direction Of(Event Player));
+		Wait(0.05, Ignore Condition);
+		Set Player Variable At Index(Event Player, A, 8, Value In Array(All Players(Team(All)), 0));
+		Set Player Variable At Index(Value In Array(Player Variable(Event Player, A), 8), A, 1, 0);
+		Play Effect(Event Player, Good Pickup Effect, Green, Value In Array(Player Variable(Event Player, A), 8), 1);
+		Play Effect(Event Player, Buff Explosion Sound, Green, Event Player, 100);
+	}
 }
 
-rule ("FUNCTION: Destroy bot on death") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isDummyBot(eventPlayer) == true;
-        isDead(eventPlayer) == true;
-    }
+rule("PICK HEROES: Select Player")
+{
 
-    actions {
-        destroyDummyBot(teamOf(eventPlayer), slotOf(eventPlayer));
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Primary Fire), Not(Is Button Held(Event Player, Ability1))), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 4
+	actions
+	{
+		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 3);
+		Set Player Variable At Index(Event Player, A, 8, Value In Array(Player Variable(Event Player, A), 12));
+		Play Effect(Event Player, Ring Explosion, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5);
+		Play Effect(Event Player, Ring Explosion Sound, Green, Event Player, 100);
+	}
 }
 
-rule ("MODE: Normal Play") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, A) == 0;
-        isGameInProgress == true;
-    }
+rule("PICK HEROES: Move Player")
+{
 
-    actions {
-        destroyEffect(playerVariable(eventPlayer, E));
-        destroyEffect(playerVariable(eventPlayer, K));
-        destroyHudText(playerVariable(eventPlayer, F));
-        destroyHudText(playerVariable(eventPlayer, C));
-        createHudText(eventPlayer, string("play", null, null, null), null, null, Top, 1, Purple, White, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, C, lastTextId);
-        skipIf(not(valueInArray(playerVariable(eventPlayer, N), 1)), 1);
-        setPlayerVariable(eventPlayer, D, true);
-        skip(0);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Secondary Fire), Not(Is Button Held(Event Player, Ability1))), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Teleport(Value In Array(Player Variable(Event Player, A), 8), Value In Array(Player Variable(Event Player, A), 11));
+	}
 }
 
-rule ("MODE: Pick Heroes") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, A) == 1;
-        isGameInProgress == true;
-    }
+rule("PICK HEROES: Delete Player")
+{
 
-    actions {
-        destroyEffect(playerVariable(eventPlayer, E));
-        createEffect(eventPlayer, Ring, Purple, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false), 1, PositionAndRadius);
-        setPlayerVariable(eventPlayer, E, lastCreatedEntity);
-        destroyEffect(playerVariable(eventPlayer, K));
-        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
-        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
-        destroyHudText(playerVariable(eventPlayer, C));
-        createHudText(eventPlayer, string("{0} {1}", string("pick", null, null, null), string("heroes", null, null, null), null), null, null, Top, 1, Purple, White, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, C, lastTextId);
-        skipIf(valueInArray(playerVariable(eventPlayer, N), 1), 1);
-        setPlayerVariable(eventPlayer, D, true);
-        skip(0);
-        destroyHudText(playerVariable(eventPlayer, F));
-        createHudText(eventPlayer, heroIconString(valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), Left, 0, Blue, Blue, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, F, lastTextId);
-        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ultimate), Is Button Held(Event Player, Ability1)), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 6
+	actions
+	{
+		Destroy Dummy Bot(TeamOf(Value In Array(Player Variable(Event Player, A), 8)), Slot Of(Value In Array(Player Variable(Event Player, A), 8)));
+		Play Effect(Event Player, Bad Pickup Effect, Red, Value In Array(Player Variable(Event Player, A), 8), 1);
+		Play Effect(Event Player, Debuff Impact Sound, Red, Event Player, 100);
+		Wait(0.5, Ignore Condition);
+		Skip If(Not(Compare(Event Player, !=, Value In Array(All Players(Team(All)), 0))), 1);
+		Set Player Variable At Index(Event Player, A, 8, Value In Array(All Players(Team(All)), 0));
+	}
 }
 
-rule ("MODE: Behavior Builder") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, A) == 2;
-        isGameInProgress == true;
-    }
+rule("PICK HEROES: Set facing")
+{
 
-    actions {
-        destroyHudText(playerVariable(eventPlayer, F));
-        destroyEffect(playerVariable(eventPlayer, K));
-        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
-        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
-        destroyEffect(playerVariable(eventPlayer, E));
-        createEffect(eventPlayer, Ring, Purple, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false), 1, PositionAndRadius);
-        setPlayerVariable(eventPlayer, E, lastCreatedEntity);
-        destroyHudText(playerVariable(eventPlayer, C));
-        createHudText(eventPlayer, string("{0} {1}", string("build", null, null, null), string("heroes", null, null, null), null), null, null, Top, 1, Purple, White, White, VisibleToAndString, Defaultvisibility);
-        setPlayerVariable(eventPlayer, C, lastTextId);
-        skipIf(valueInArray(playerVariable(eventPlayer, N), 1), 1);
-        setPlayerVariable(eventPlayer, D, true);
-        skip(0);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Secondary Fire), Is Button Held(Event Player, Ability1)), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Set Facing(Value In Array(Player Variable(Event Player, A), 8), Subtract(Value In Array(Player Variable(Event Player, A), 11), Eye Position(Value In Array(Player Variable(Event Player, A), 8))), To World);
+	}
 }
 
-rule ("FUNCTION: Previous Hero") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, Ultimate) == true;
-        isButtonHeld(eventPlayer, Ability1) == false;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("PICK HEROES: Change Team")
+{
 
-    actions {
-        skipIf(compare(playerVariable(eventPlayer, G), <=, 0), 2);
-        modifyPlayerVariable(eventPlayer, G, Subtract, 1);
-        skip(1);
-        setPlayerVariable(eventPlayer, G, subtract(countOf(globalVariable(H)), 1));
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ability2), Is Button Held(Event Player, Ability1)), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
+	}
+	
+	// Action count: 5
+	actions
+	{
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 7), ==, Team(Team1))), 2);
+		Set Player Variable At Index(Event Player, A, 7, Team(Team2));
+		Skip(2);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 7), ==, Team(Team2))), 1);
+		Set Player Variable At Index(Event Player, A, 7, Team(Team1));
+	}
 }
 
-rule ("FUNCTION: Next Hero") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, Ability2) == true;
-        isButtonHeld(eventPlayer, Ability1) == false;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BUILD HEROES: Select Player")
+{
 
-    actions {
-        skipIf(compare(playerVariable(eventPlayer, G), >=, subtract(countOf(globalVariable(H)), 1)), 2);
-        modifyPlayerVariable(eventPlayer, G, Add, 1);
-        skip(1);
-        setPlayerVariable(eventPlayer, G, 0);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Primary Fire), Not(Is Button Held(Event Player, Ability1))), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2)) == True;
+	}
+	
+	// Action count: 4
+	actions
+	{
+		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 3);
+		Set Player Variable At Index(Event Player, A, 8, Value In Array(Player Variable(Event Player, A), 12));
+		Play Effect(Event Player, Ring Explosion, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5);
+		Play Effect(Event Player, Ring Explosion Sound, Green, Event Player, 100);
+	}
 }
 
-rule ("FUNCTION: Change Team") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, Ability2) == true;
-        isButtonHeld(eventPlayer, Ability1) == true;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BUILD HEROES: Cycle Behaviors - Forward")
+{
 
-    actions {
-        skipIf(compare(playerVariable(eventPlayer, T), ==, Team1), 2);
-        setPlayerVariable(eventPlayer, T, Team1);
-        skip(1);
-        setPlayerVariable(eventPlayer, T, Team2);
-        destroyEffect(playerVariable(eventPlayer, K));
-        createEffect(eventPlayer, Ring, Green, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), 1.5, PositionAndRadius);
-        setPlayerVariable(eventPlayer, K, lastCreatedEntity);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ability2), Is Game In Progress), Not(Is Button Held(Event Player, Ability1))), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2)) == True;
+	}
+	
+	// Action count: 17
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 27), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 28, Value In Array(Player Variable(Event Player, A), 27));
+		Set Player Variable At Index(Event Player, A, 27, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 28));
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 5), >=, Subtract(Count Of(Value In Array(Global Variable(A), 4)), 1))), 2);
+		Set Player Variable At Index(Event Player, A, 5, 0);
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 5, Add(Value In Array(Player Variable(Event Player, A), 5), 1));
+		Skip If(Not(And(Compare(Round To Integer(Divide(Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)), 100), Down), !=, 0), Compare(Round To Integer(Divide(Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)), 100), Down), !=, Add(Index Of Array Value(Value In Array(Global Variable(A), 2), Hero Of(Value In Array(Player Variable(Event Player, A), 8))), 1)))), 6);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 5), >=, Subtract(Count Of(Value In Array(Global Variable(A), 4)), 1))), 2);
+		Set Player Variable At Index(Event Player, A, 5, 0);
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 5, Add(Value In Array(Player Variable(Event Player, A), 5), 1));
+		Set Player Variable At Index(Event Player, A, 27, 4);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 27, 0);
+	}
 }
 
-rule ("FUNCTION: Place/Move Hero") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, PrimaryFire) == true;
-        isButtonHeld(eventPlayer, Ability1) == false;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BUILD HEROES: Cycle Behaviors - Back")
+{
 
-    actions {
-        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(heroOf(currentArrayElement), ==, valueInArray(globalVariable(H), playerVariable(eventPlayer, G)))), 4);
-        createDummyBot(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T), -1, playerVariable(eventPlayer, Q), facingDirectionOf(eventPlayer));
-        setPlayerVariable(playersOnHero(playerVariable(eventPlayer, T), valueInArray(globalVariable(H), playerVariable(eventPlayer, G))), B, 0);
-        playEffect(allPlayers(AllTeams), GoodAura, Green, positionOf(playerVariable(eventPlayer, R)), 1);
-        skip(1);
-        teleport(playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)), playerVariable(eventPlayer, Q));
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ultimate), Is Game In Progress), Not(Is Button Held(Event Player, Ability1))), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2)) == True;
+	}
+	
+	// Action count: 17
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 29), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 30, Value In Array(Player Variable(Event Player, A), 29));
+		Set Player Variable At Index(Event Player, A, 29, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 30));
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 5), <=, 0)), 2);
+		Set Player Variable At Index(Event Player, A, 5, Subtract(Count Of(Value In Array(Global Variable(A), 4)), 1));
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 5, Subtract(Value In Array(Player Variable(Event Player, A), 5), 1));
+		Skip If(Not(And(Compare(Round To Integer(Divide(Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)), 100), Down), !=, 0), Compare(Round To Integer(Divide(Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)), 100), Down), !=, Add(Index Of Array Value(Value In Array(Global Variable(A), 2), Hero Of(Value In Array(Player Variable(Event Player, A), 8))), 1)))), 6);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 5), <=, 0)), 2);
+		Set Player Variable At Index(Event Player, A, 5, Subtract(Count Of(Value In Array(Global Variable(A), 4)), 1));
+		Skip(1);
+		Set Player Variable At Index(Event Player, A, 5, Subtract(Value In Array(Player Variable(Event Player, A), 5), 1));
+		Set Player Variable At Index(Event Player, A, 29, 4);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 29, 0);
+	}
 }
 
-actions {
-    playEffect(eventPlayer, GoodAura, Green, eventPlayer, 1);
+
+rule("BUILD HEROES: Apply Behavior")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(And(Is Button Held(Event Player, Ultimate), Is Button Held(Event Player, Ability1)), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2)) == True;
+	}
+	
+	// Action count: 2
+	actions
+	{
+		Play Effect(Event Player, Good Pickup Effect, Sky Blue, Value In Array(Player Variable(Event Player, A), 8), 1);
+		Set Player Variable At Index(Value In Array(Player Variable(Event Player, A), 8), A, 1, Value In Array(Value In Array(Global Variable(A), 4), Value In Array(Player Variable(Event Player, A), 5)));
+	}
 }
 
-rule ("FUNCTION: Update Hero's Facing Direction") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, SecondaryFire) == true;
-        isButtonHeld(eventPlayer, Ability1) == false;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BEHAVIOR: Stationary")
+{
 
-    actions {
-        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, J, playersOnHero(valueInArray(globalVariable(H), playerVariable(eventPlayer, G)), playerVariable(eventPlayer, T)));
-        skipIf(isTrueForAny(allPlayers(playerVariable(eventPlayer, T)), compare(currentArrayElement, ==, playerVariable(eventPlayer, J))), 2);
-        wait(0.1, IgnoreCondition);
-        skip(1);
-        setFacing(playerVariable(eventPlayer, J), directionTowards(eyePosition(playerVariable(eventPlayer, J)), playerVariable(eventPlayer, Q)), ToWorld);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 0), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 8
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+		Stop Holding Button(Event Player, Primary Fire);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Stop Holding Button(Event Player, Ability1);
+		Stop Holding Button(Event Player, Ability2);
+		Stop Holding Button(Event Player, Ultimate);
+		Stop Holding Button(Event Player, Crouch);
+		Stop Holding Button(Event Player, Jump);
+	}
 }
 
-rule ("FUNCTION: Select Hero") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, PrimaryFire) == true;
-        isButtonHeld(eventPlayer, Ability1) == true;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BEHAVIOR: Strafe")
+{
 
-    actions {
-        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        skipIf(isTrueForAll(globalVariable(H), compare(currentArrayElement, !=, heroOf(playerVariable(eventPlayer, R)))), 3);
-        setPlayerVariable(eventPlayer, T, teamOf(playerVariable(eventPlayer, R)));
-        setPlayerVariable(eventPlayer, G, indexOfArrayValue(globalVariable(H), heroOf(playerVariable(eventPlayer, R))));
-        skip(1);
-        wait(0.1, IgnoreCondition);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 1), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 22
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 33), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 34, Value In Array(Player Variable(Event Player, A), 33));
+		Set Player Variable At Index(Event Player, A, 33, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 34));
+		Set Player Variable At Index(Event Player, A, 31, 0.3);
+		Set Player Variable At Index(Event Player, A, 32, 0);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 1)), 12);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 32), >=, Value In Array(Player Variable(Event Player, A), 31))), 2);
+		Start Throttle In Direction(Event Player, Vector(-1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip(2);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 32), <=, Multiply(Value In Array(Player Variable(Event Player, A), 31), -1))), 1);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(1, 0, 0))), 2);
+		Set Player Variable At Index(Event Player, A, 32, Add(Value In Array(Player Variable(Event Player, A), 32), 0.016));
+		Skip(2);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(-1, 0, 0))), 1);
+		Set Player Variable At Index(Event Player, A, 32, Subtract(Value In Array(Player Variable(Event Player, A), 32), 0.016));
+		Set Player Variable At Index(Event Player, A, 33, 3);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 33, 0);
+	}
 }
 
-rule ("FUNCTION: Destroy Bot") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        isButtonHeld(eventPlayer, SecondaryFire) == true;
-        isButtonHeld(eventPlayer, Ability1) == true;
-        isGameInProgress == true;
-        playerVariable(eventPlayer, A) == 1;
-    }
+rule("BEHAVIOR: Long Strafe")
+{
 
-    actions {
-        setPlayerVariable(eventPlayer, Q, raycastHitPosition(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        setPlayerVariable(eventPlayer, R, raycastHitPlayer(playerVariable(eventPlayer, P), add(playerVariable(eventPlayer, P), multiply(facingDirectionOf(eventPlayer), 1000)), allPlayers(AllTeams), eventPlayer, false));
-        destroyDummyBot(teamOf(playerVariable(eventPlayer, R)), slotOf(playerVariable(eventPlayer, R)));
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 2), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 22
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 37), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 38, Value In Array(Player Variable(Event Player, A), 37));
+		Set Player Variable At Index(Event Player, A, 37, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 38));
+		Set Player Variable At Index(Event Player, A, 35, 1);
+		Set Player Variable At Index(Event Player, A, 36, 0);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 2)), 12);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 36), >=, Value In Array(Player Variable(Event Player, A), 35))), 2);
+		Start Throttle In Direction(Event Player, Vector(-1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip(2);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 36), <=, Multiply(Value In Array(Player Variable(Event Player, A), 35), -1))), 1);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(1, 0, 0))), 2);
+		Set Player Variable At Index(Event Player, A, 36, Add(Value In Array(Player Variable(Event Player, A), 36), 0.016));
+		Skip(2);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(-1, 0, 0))), 1);
+		Set Player Variable At Index(Event Player, A, 36, Subtract(Value In Array(Player Variable(Event Player, A), 36), 0.016));
+		Set Player Variable At Index(Event Player, A, 37, 3);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 37, 0);
+	}
 }
 
-rule ("FUNCTION: Disable Abilities") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, I) == false;
-        isGameInProgress == true;
-    }
+rule("BEHAVIOR: AD Spam")
+{
 
-    actions {
-        disallowButton(eventPlayer, PrimaryFire);
-        disallowButton(eventPlayer, SecondaryFire);
-        disallowButton(eventPlayer, Ability1);
-        disallowButton(eventPlayer, Ability2);
-        disallowButton(eventPlayer, Ultimate);
-        disallowButton(eventPlayer, Interact);
-        disallowButton(eventPlayer, Jump);
-        disallowButton(eventPlayer, Crouch);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 3), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 22
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 41), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 42, Value In Array(Player Variable(Event Player, A), 41));
+		Set Player Variable At Index(Event Player, A, 41, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 42));
+		Set Player Variable At Index(Event Player, A, 39, 0.05);
+		Set Player Variable At Index(Event Player, A, 40, 0);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 3)), 12);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 40), >=, Value In Array(Player Variable(Event Player, A), 39))), 2);
+		Start Throttle In Direction(Event Player, Vector(-1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip(2);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 40), <=, Multiply(Value In Array(Player Variable(Event Player, A), 39), -1))), 1);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(1, 0, 0))), 2);
+		Set Player Variable At Index(Event Player, A, 40, Add(Value In Array(Player Variable(Event Player, A), 40), 0.016));
+		Skip(2);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(-1, 0, 0))), 1);
+		Set Player Variable At Index(Event Player, A, 40, Subtract(Value In Array(Player Variable(Event Player, A), 40), 0.016));
+		Set Player Variable At Index(Event Player, A, 41, 3);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 41, 0);
+	}
 }
 
-rule ("FUNCTION: Disable Abilities") {
-    event {
-        ongoing-eachplayer;
-        all;
-        all;
-    }
 
-    conditions {
-        playerVariable(eventPlayer, I) == true;
-        isGameInProgress == true;
-    }
+rule("BEHAVIOR: Crouch Strafe")
+{
 
-    actions {
-        allowButton(eventPlayer, PrimaryFire);
-        allowButton(eventPlayer, SecondaryFire);
-        allowButton(eventPlayer, Ability1);
-        allowButton(eventPlayer, Ability2);
-        allowButton(eventPlayer, Ultimate);
-        allowButton(eventPlayer, Interact);
-        allowButton(eventPlayer, Jump);
-        allowButton(eventPlayer, Crouch);
-    }
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 4), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 26
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 45), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 46, Value In Array(Player Variable(Event Player, A), 45));
+		Set Player Variable At Index(Event Player, A, 45, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 46));
+		Set Player Variable At Index(Event Player, A, 43, 0.2);
+		Set Player Variable At Index(Event Player, A, 44, 0);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 4)), 16);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 44), >=, Value In Array(Player Variable(Event Player, A), 43))), 3);
+		Stop Holding Button(Event Player, Crouch);
+		Start Throttle In Direction(Event Player, Vector(-1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip(3);
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 44), <=, Multiply(Value In Array(Player Variable(Event Player, A), 43), -1))), 2);
+		Stop Holding Button(Event Player, Crouch);
+		Start Throttle In Direction(Event Player, Vector(1, 0, 0), 1, To Player, Replace Existing Throttle, Direction And Magnitude);
+		Skip If(Not(And(Compare(Value In Array(Player Variable(Event Player, A), 44), >, Subtract(0, 0.03)), Compare(Value In Array(Player Variable(Event Player, A), 44), <, Add(0, 0.03)))), 1);
+		Start Holding Button(Event Player, Crouch);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(1, 0, 0))), 2);
+		Set Player Variable At Index(Event Player, A, 44, Add(Value In Array(Player Variable(Event Player, A), 44), 0.016));
+		Skip(2);
+		Skip If(Not(Compare(Throttle Of(Event Player), ==, Vector(-1, 0, 0))), 1);
+		Set Player Variable At Index(Event Player, A, 44, Subtract(Value In Array(Player Variable(Event Player, A), 44), 0.016));
+		Set Player Variable At Index(Event Player, A, 45, 3);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 45, 0);
+	}
+}
+
+
+rule("BEHAVIOR: ORISA: Deploy Shield on Cooldown")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 201), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 11
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 47), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 48, Value In Array(Player Variable(Event Player, A), 47));
+		Set Player Variable At Index(Event Player, A, 47, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 48));
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 201)), 4);
+		Press Button(Event Player, Ability2);
+		Wait(10, Ignore Condition);
+		Set Player Variable At Index(Event Player, A, 47, 0);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 47, 0);
+	}
+}
+
+
+rule("BEHAVIOR: REINHARDT: Shield Up")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 301), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+
+rule("BEHAVIOR: SIGMA: Deploy Shield")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 501), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 3
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(1.5, Ignore Condition);
+		Stop Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+
+rule("BEHAVIOR: WINSTON: Deploy Bubble")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 601), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 11
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 49), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 50, Value In Array(Player Variable(Event Player, A), 49));
+		Set Player Variable At Index(Event Player, A, 49, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 50));
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 601)), 4);
+		Press Button(Event Player, Ability2);
+		Wait(13, Ignore Condition);
+		Set Player Variable At Index(Event Player, A, 49, 0);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 49, 0);
+	}
+}
+
+
+rule("BEHAVIOR: HAMMOND: Ball")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 701), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Press Button(Event Player, Ability1);
+	}
+}
+
+
+rule("BEHAVIOR: ZARYA: Personal Bubble")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 801), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 11
+	actions
+	{
+		Wait(0.016, Ignore Condition); // ContinueSkip Wait
+		Skip If(Compare(Value In Array(Player Variable(Event Player, A), 51), ==, 0), 3); // ContinueSkip Skipper
+		Set Player Variable At Index(Event Player, A, 52, Value In Array(Player Variable(Event Player, A), 51));
+		Set Player Variable At Index(Event Player, A, 51, 0);
+		Skip(Value In Array(Player Variable(Event Player, A), 52));
+		Skip If(Not(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 801)), 4);
+		Press Button(Event Player, Ability1);
+		Wait(10, Ignore Condition);
+		Set Player Variable At Index(Event Player, A, 51, 0);
+		Loop;
+		Set Player Variable At Index(Event Player, A, 51, 0);
+	}
+}
+
+
+rule("BEHAVIOR: BASTION: Sentry")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 1001), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Press Button(Event Player, Ability1);
+	}
+}
+
+
+rule("BEHAVIOR: BRIGITTE: Shield")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 2701), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+
+rule("FUNCTION: Destroy bot on death")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(Is Dead(Event Player), Is Dummy Bot(Event Player)) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Destroy Dummy Bot(TeamOf(Event Player), Slot Of(Event Player));
+	}
 }
 
