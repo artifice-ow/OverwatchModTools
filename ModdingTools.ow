@@ -135,7 +135,7 @@ rule("SETUP: Setup global variables")
 		Set Global Variable At Index(B, 1, Value In Array(Global Variable(A), 16));
 		Set Global Variable At Index(C, Value In Array(Global Variable(A), 14), Global Variable(B));
 		Set Global Variable At Index(A, 3, Append To Array(Append To Array(Append To Array(Empty Array, Value In Array(Global Variable(A), 8)), Value In Array(Global Variable(A), 11)), Value In Array(Global Variable(A), 14)));
-		Set Global Variable At Index(A, 4, Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Empty Array, 0), 1), 2), 3), 4), 201), 301), 501), 601), 701), 801), 1001), 2701));
+		Set Global Variable At Index(A, 4, Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Append To Array(Empty Array, 0), 1), 2), 3), 4), 6), 7), 201), 301), 501), 601), 701), 801), 1001), 2701));
 	}
 }
 
@@ -511,7 +511,7 @@ rule("PICK HEROES: Place Heroes")
 		Set Player Variable At Index(Event Player, A, 8, Value In Array(All Players(Team(All)), 0));
 		Set Player Variable At Index(Value In Array(Player Variable(Event Player, A), 8), A, 1, 0);
 		Play Effect(Event Player, Good Pickup Effect, Green, Value In Array(Player Variable(Event Player, A), 8), 1);
-		Play Effect(Event Player, Buff Explosion Sound, Green, Event Player, 100);
+		Play Effect(Event Player, Buff Explosion Sound, White, Value In Array(Player Variable(Event Player, A), 9), 100);
 	}
 }
 
@@ -531,13 +531,12 @@ rule("PICK HEROES: Select Player")
 		And(And(And(Is Button Held(Event Player, Primary Fire), Not(Is Button Held(Event Player, Ability1))), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 1)) == True;
 	}
 	
-	// Action count: 4
+	// Action count: 3
 	actions
 	{
-		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 3);
+		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 2);
 		Set Player Variable At Index(Event Player, A, 8, Value In Array(Player Variable(Event Player, A), 12));
-		Play Effect(Event Player, Ring Explosion, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5);
-		Play Effect(Event Player, Ring Explosion Sound, Green, Event Player, 100);
+		Play Effect(Event Player, Ring Explosion, Green, Position of(Value In Array(Player Variable(Event Player, A), 8)), 3.5);
 	}
 }
 
@@ -585,7 +584,7 @@ rule("PICK HEROES: Delete Player")
 	{
 		Destroy Dummy Bot(TeamOf(Value In Array(Player Variable(Event Player, A), 8)), Slot Of(Value In Array(Player Variable(Event Player, A), 8)));
 		Play Effect(Event Player, Bad Pickup Effect, Red, Value In Array(Player Variable(Event Player, A), 8), 1);
-		Play Effect(Event Player, Debuff Impact Sound, Red, Event Player, 100);
+		Play Effect(Event Player, Explosion Sound, White, Value In Array(Player Variable(Event Player, A), 9), 100);
 		Wait(0.5, Ignore Condition);
 		Skip If(Not(Compare(Event Player, !=, Value In Array(All Players(Team(All)), 0))), 1);
 		Set Player Variable At Index(Event Player, A, 8, Value In Array(All Players(Team(All)), 0));
@@ -658,13 +657,12 @@ rule("BUILD HEROES: Select Player")
 		And(And(And(Is Button Held(Event Player, Primary Fire), Not(Is Button Held(Event Player, Ability1))), Is Game In Progress), Compare(Value In Array(Player Variable(Event Player, A), 0), ==, 2)) == True;
 	}
 	
-	// Action count: 4
+	// Action count: 3
 	actions
 	{
-		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 3);
+		Skip If(Not(Is True For Any(Value In Array(Global Variable(A), 2), Compare(Current Array Element, ==, Hero Of(Value In Array(Player Variable(Event Player, A), 12))))), 2);
 		Set Player Variable At Index(Event Player, A, 8, Value In Array(Player Variable(Event Player, A), 12));
-		Play Effect(Event Player, Ring Explosion, Green, Value In Array(Player Variable(Event Player, A), 8), 1.5);
-		Play Effect(Event Player, Ring Explosion Sound, Green, Event Player, 100);
+		Play Effect(Event Player, Ring Explosion, Green, Position of(Value In Array(Player Variable(Event Player, A), 8)), 3.5);
 	}
 }
 
@@ -977,6 +975,53 @@ rule("BEHAVIOR: Crouch Strafe")
 		Set Player Variable At Index(Event Player, A, 45, 3);
 		Loop;
 		Set Player Variable At Index(Event Player, A, 45, 0);
+	}
+}
+
+
+rule("BEHAVIOR: Track Closest Enemy")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 6), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 1
+	actions
+	{
+		Start Facing(Event Player, Closest Player To(Event Player, Opposite Team Of(Event Player)), 1, To Player, Direction And Turn Rate);
+	}
+}
+
+
+rule("BEHAVIOR: Shoot Closest Enemy")
+{
+
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+	
+	conditions
+	{
+		And(And(Compare(Value In Array(Player Variable(Event Player, A), 1), ==, 7), Is Dummy Bot(Event Player)), Is Game In Progress) == True;
+	}
+	
+	// Action count: 2
+	actions
+	{
+		Start Facing(Event Player, Closest Player To(Event Player, Opposite Team Of(Event Player)), 1, To Player, Direction And Turn Rate);
+		Start Holding Button(Event Player, Primary Fire);
 	}
 }
 
