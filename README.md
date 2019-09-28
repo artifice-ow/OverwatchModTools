@@ -28,8 +28,9 @@ Set Hero Facing | `Ability 1 + Secondary Fire`
 ## Build Heroes
 This mode is for changing the behavior of heroes  
 [List of Behaviors](BEHAVIORS.md)
-| Action | Button Map |
-|--------|------------|
+
+| Action | Button Map |  
+|--------|------------|  
 Select Hero | `Primary Fire`    
 Next Behavior | `Ability 2`  
 Prev Behavior | `Ultimate`  

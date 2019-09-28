@@ -7,6 +7,8 @@ define globalvar flySpeed;
 define globalvar boostSpeed;
 define globalvar cameraSmoothing;
 
+define globalvar savedBots;
+
 // Player Variables
 define playervar mode;
 define playervar behavior;
@@ -78,6 +80,8 @@ Event.OngoingGlobal
         Hero.Zenyatta
         ];
     
+    savedBots = [];
+
     // Setup Modes
     modes = [
         // Play Mode
@@ -95,6 +99,8 @@ Event.OngoingGlobal
         2,
         3,
         4,
+        6,
+        7,
         201,
         301,
         501,
@@ -102,6 +108,7 @@ Event.OngoingGlobal
         701,
         801,
         1001,
+        1101,
         2701
     ];
 }
@@ -190,7 +197,19 @@ if (EventPlayer().mode == 0 && IsGameInProgress())
     DestroyEffect(cursor);
     DestroyHudText(modeMenu);
     Wait(0.016);
-    CreateHudText(EventPlayer(),"Play", null, null, Location.Top, 1, Color.White, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
+    CreateHudText(
+        EventPlayer(),
+        "Play", 
+        null, 
+        null, 
+        Location.Top, 
+        1, 
+        Color.White, 
+        Color.White, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
     EventPlayer().modeMenu = LastTextID();
 
 }
@@ -202,19 +221,57 @@ if (EventPlayer().mode == 1 && IsGameInProgress())
     DestroyHudText(buildHeroesMenu);
     DestroyHudText(modeMenu);
     Wait(0.016);
-    CreateHudText(EventPlayer(),"Pick Heroes", null, null, Location.Top, 1, Color.Blue, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
+    CreateHudText(
+        EventPlayer(),
+        "Pick Heroes", 
+        null, 
+        null, 
+        Location.Top, 
+        1, 
+        Color.Blue, 
+        Color.White, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
     EventPlayer().modeMenu = LastTextID();
 
     DestroyHudText(pickHeroesMenu);
-    CreateHudText(EventPlayer(), HeroIconString(selectedHero), selectedTeam, selectedHero, Location.Top, 2, Color.Blue, Color.Blue, Color.White, StringRev.String, Spectators.VisibleNever);
+    CreateHudText(
+        EventPlayer(), 
+        HeroIconString(selectedHero), 
+        selectedTeam, 
+        selectedHero, 
+        Location.Top, 
+        2, 
+        Color.Blue, 
+        Color.Blue, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
     EventPlayer().pickHeroesMenu = LastTextID();
 
     DestroyEffect(cursor);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
+    CreateEffect(
+        EventPlayer(), 
+        Effect.Ring, 
+        Color.Blue, 
+        EventPlayer().hitPosition,
+        1, 
+        EffectRev.PositionAndRadius
+    );
     EventPlayer().cursor = LastCreatedEntity();
 
     DestroyEffect(selectionMarker);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Green, EventPlayer().selectedPlayer, 1.5, EffectRev.PositionAndRadius);
+    CreateEffect(
+        EventPlayer(),
+        Effect.Ring, 
+        Color.Green, 
+        EventPlayer().selectedPlayer, 
+        1.5, 
+        EffectRev.PositionAndRadius
+    );
     EventPlayer().selectionMarker = LastCreatedEntity();
 
     // Fixes bug where 1 element isn't rendered on first mode switch
@@ -234,26 +291,71 @@ if (EventPlayer().mode == 2 && IsGameInProgress())
     DestroyHudText(pickHeroesMenu);
     DestroyHudText(modeMenu);
     Wait(0.016);
-    CreateHudText(EventPlayer(),"Build Heroes", null, null, Location.Top, 1, Color.Orange, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
+    CreateHudText(
+        EventPlayer(),
+        "Build Heroes", 
+        null, 
+        null, 
+        Location.Top, 
+        1, 
+        Color.Orange, 
+        Color.White, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
     EventPlayer().modeMenu = LastTextID();
 
     DestroyHudText(buildHeroesMenu);
-    CreateHudText(EventPlayer(), HeroIconString(HeroOf(selectedPlayer)), "Selected Ability", behaviors[behaviorIndex], Location.Top, 2, Color.Orange, Color.Orange, Color.White, StringRev.String, Spectators.VisibleNever);
+    CreateHudText(
+        EventPlayer(), 
+        HeroIconString(HeroOf(selectedPlayer)), 
+        "Selected Ability",
+        behaviors[behaviorIndex], 
+        Location.Top, 
+        2, 
+        Color.Orange, 
+        Color.Orange, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
     EventPlayer().buildHeroesMenu = LastTextID();
 
     DestroyEffect(cursor);
-    CreateEffect(EventPlayer(),Effect.Ring, Color.Orange, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
+    CreateEffect(
+        EventPlayer(),
+        Effect.Ring, 
+        Color.Orange, 
+        EventPlayer().hitPosition,
+        1, 
+        EffectRev.PositionAndRadius
+    );
     EventPlayer().cursor = LastCreatedEntity();
 
     DestroyEffect(selectionMarker);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Green, EventPlayer().selectedPlayer, 1.5, EffectRev.PositionAndRadius);
+    CreateEffect(
+        EventPlayer(), 
+        Effect.Ring, 
+        Color.Green, 
+        EventPlayer().selectedPlayer, 
+        1.5, 
+        EffectRev.PositionAndRadius
+    );
     EventPlayer().selectionMarker = LastCreatedEntity();
 
     // Fixes bug where 1 element isn't rendered on first mode switch
     if (fixerEffect == 0 || fixerEffect == null)
     {
         DestroyEffect(fixerEffect);
-        CreateEffect(EventPlayer(), Effect.Orb, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
+        CreateEffect(
+            EventPlayer(), 
+            Effect.Orb, 
+            Color.Blue, 
+            EventPlayer().hitPosition, 
+            1, 
+            EffectRev.PositionAndRadius
+        );
         EventPlayer().fixerEffect = LastCreatedEntity();
     }
 }
@@ -312,7 +414,7 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && IsButtonHeld(EventPlayer(
         EventPlayer().selectedPlayer = AllPlayers()[0];
         selectedPlayer.behavior = 0;
         PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.Green, selectedPlayer, 1);
-        PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.White, EventPlayer().flyPosition, 100);
     }
 }
 
@@ -323,8 +425,7 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
         EventPlayer().selectedPlayer = hitPlayer;
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, selectedPlayer, 1.5);
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, PositionOf(selectedPlayer), 3.5);
     }
 }
 
@@ -341,7 +442,7 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), 
 {
     DestroyDummyBot(TeamOf(selectedPlayer), SlotOf(selectedPlayer));
     PlayEffect(EventPlayer(), PlayEffect.BadPickupEffect, Color.Red, selectedPlayer, 1);
-    PlayEffect(EventPlayer(), PlayEffect.DebuffImpactSound, Color.Red, EventPlayer(), 100);
+    PlayEffect(EventPlayer(), PlayEffect.ExplosionSound, Color.White, EventPlayer().flyPosition, 100);
     Wait(0.5);
     if(EventPlayer() != AllPlayers()[0])
     {
@@ -377,8 +478,7 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
         EventPlayer().selectedPlayer = hitPlayer;
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, selectedPlayer, 1.5);
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, PositionOf(selectedPlayer), 3.5);
     }
 }
 
@@ -438,6 +538,7 @@ Event.OngoingPlayer
 if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 2)
 {
     PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.SkyBlue, selectedPlayer, 1);
+    resetBehaviors(selectedPlayer);
     selectedPlayer.behavior = behaviors[behaviorIndex];
 }
 
@@ -445,14 +546,7 @@ rule: "BEHAVIOR: Stationary"
 Event.OngoingPlayer
 if (EventPlayer().behavior == 0 && IsDummyBot(EventPlayer()) && IsGameInProgress())
 {
-    StopThrottleInDirection(EventPlayer());
-    StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-    StopHoldingButton(EventPlayer(), Button.Ability1);
-    StopHoldingButton(EventPlayer(), Button.Ability2);
-    StopHoldingButton(EventPlayer(), Button.Ultimate);
-    StopHoldingButton(EventPlayer(), Button.Crouch);
-    StopHoldingButton(EventPlayer(), Button.Jump);
+    resetBehaviors(EventPlayer());
 }
 
 rule: "BEHAVIOR: Strafe"
@@ -573,6 +667,27 @@ if (EventPlayer().behavior == 4 && IsDummyBot(EventPlayer()) && IsGameInProgress
     }
 }
 
+rule: "BEHAVIOR: Track Closest Enemy"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 6 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    while (EventPlayer().behavior == 6)
+    {
+        StartFacing(EventPlayer(), DirectionTowards(EventPlayer(), ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))), 20000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
+    }
+}
+
+rule: "BEHAVIOR: Shoot Closest Enemy"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 7 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    StartHoldingButton(EventPlayer(), Button.PrimaryFire);
+    while (EventPlayer().behavior == 7)
+    {
+        StartFacing(EventPlayer(), DirectionTowards(EventPlayer(), ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))), 20000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
+    }
+}
+
 rule: "BEHAVIOR: ORISA: Deploy Shield on Cooldown"
 Event.OngoingPlayer
 if (EventPlayer().behavior == 201 && IsDummyBot(EventPlayer()) && IsGameInProgress())
@@ -636,6 +751,61 @@ if (EventPlayer().behavior == 1001 && IsDummyBot(EventPlayer()) && IsGameInProgr
     PressButton(EventPlayer(), Button.Ability1);
 }
 
+rule: "BEHAVIOR: DOOMFIST: Combo"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 1101 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+{
+    define initialPosition;
+    initialPosition = PositionOf(EventPlayer());
+    while (EventPlayer().behavior == 1101)
+    {
+        if(IsTrueForAny(PlayersWithinRadius(EventPlayer(), 15, OppositeTeamOf(TeamOf(EventPlayer())), RadiusLOS.Surfaces), ArrayElement() == ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))) && !IsDead(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))))
+        {
+            StartFacing(
+                EventPlayer(), 
+                DirectionTowards(EventPlayer(), ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))), 
+                20000, 
+                Relative.ToWorld, 
+                FacingRev.DirectionAndTurnRate
+            );
+            PressButton(EventPlayer(), Button.Ability2);
+            Wait(1);
+            PressButton(EventPlayer(), Button.PrimaryFire);
+            Wait(0.1);
+            PressButton(EventPlayer(), Button.Ability1);
+            Wait(0.1);
+            StartHoldingButton(EventPlayer(), Button.PrimaryFire);
+            Wait(0.5);
+            if(IsDead(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))))
+            {
+                StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+                StopFacing(EventPlayer());
+                Wait(0.1);
+                StartFacing(
+                    EventPlayer(), 
+                    initialPosition, 
+                    20000, 
+                    Relative.ToWorld, 
+                    FacingRev.DirectionAndTurnRate
+                );  
+                Wait(0.3);
+                StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+                Wait(0.2);
+                StopHoldingButton(EventPlayer(), Button.SecondaryFire);
+                Wait(0.1);
+                PressButton(EventPlayer(), Button.Jump);
+                Wait(1);   
+            } else{
+                Wait(2);
+            }
+            StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+            Wait(1);
+            Teleport(EventPlayer(), initialPosition);
+        }
+        
+    }
+}
+
 rule: "BEHAVIOR: BRIGITTE: Shield"
 Event.OngoingPlayer
 if (EventPlayer().behavior == 2701 && IsDummyBot(EventPlayer()) && IsGameInProgress())
@@ -661,6 +831,31 @@ class Mode
         allowAbilities = setAbilities;
     }
     
+}
+
+class Bot
+{
+    public define botHero;
+    public define botSlot;
+    public define botTeam;
+    public define botBehavior;
+    public define botInitialPosition;
+    public define botInitialFacing;
+
+    public Bot(define inHero, define inSlot, define inTeam, define inBehavior, define inBehavior, define inPosition, define inFacing)
+    {
+        botHero = inHero;
+        botSlot = inSlot;
+        botTeam = inTeam;
+        botBehavior = inBehavior;
+        botInitialPosition = inPosition;
+        botInitialFacing = inFacing;
+    }
+
+    public method saveBot() 
+    {
+        Append(savedBots, this);
+    }
 }
 
 method toggleFlying(define player, define flying)
@@ -718,4 +913,23 @@ method disableAbilities(define player)
     DisallowButton(player, Button.Jump);
     DisallowButton(player, Button.Crouch);
 
+}
+
+method resetBehaviors(define player)
+{
+    StopHoldingButton(player, Button.PrimaryFire);
+    StopHoldingButton(player, Button.SecondaryFire);
+    StopHoldingButton(player, Button.Interact);
+    StopHoldingButton(player, Button.Ability1);
+    StopHoldingButton(player, Button.Ability2);
+    StopHoldingButton(player, Button.Ultimate);
+    StopHoldingButton(player, Button.Crouch);
+    StopHoldingButton(player, Button.Jump);
+
+    StopAccelerating(player);
+    StopThrottleInDirection(player);
+    StopForcingThrottle(player);
+    StopFacing(player);
+
+    StopTransformingThrottle(player);
 }

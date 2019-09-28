@@ -6,6 +6,8 @@
 | Long Strafe   | 2 |
 | AD Spam       | 3 |
 | Crouch Strafe | 4 |
+| Track Closest Enemy | 6 |
+| Shoot Closest Enemy | 7 |
 
 ## Orisa
 | Behavior | ID |
@@ -41,6 +43,11 @@
 | Behavior | ID |
 |----------|:---:|
 | Sentry Mode | 1001 |
+
+## Doomfist
+| Behavior | ID |
+|----------|:---:|
+| Combo | 1101 |
 
 ## Brigitte
 | Behavior | ID |
