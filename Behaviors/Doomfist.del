@@ -1,0 +1,76 @@
+import "Behaviors.del";
+// DOOMFIST
+rule: "BEHAVIOR: DOOMFIST: Combo"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 1101 
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    define startPosition;
+    startPosition = PositionOf(EventPlayer());
+    while (EventPlayer().behavior == 1101)
+    {
+        if(IsTrueForAny(
+                PlayersWithinRadius(EventPlayer(), 
+                15, 
+                OppositeTeamOf(TeamOf(EventPlayer())), 
+                RadiusLOS.Surfaces), 
+                ArrayElement() == ClosestPlayerTo(EventPlayer(), 
+                OppositeTeamOf(TeamOf(EventPlayer())))
+            ) 
+            && !IsDead(
+                ClosestPlayerTo(EventPlayer(), 
+                OppositeTeamOf(TeamOf(EventPlayer())))
+            ))
+        {
+            StartFacing(
+                EventPlayer(), 
+                DirectionTowards(
+                    EventPlayer(), 
+                    ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
+                ), 
+                20000, 
+                Relative.ToWorld, 
+                FacingRev.DirectionAndTurnRate
+            );
+            PressButton(EventPlayer(), Button.Ability2);
+            Wait(1);
+            PressButton(EventPlayer(), Button.PrimaryFire);
+            Wait(0.1);
+            PressButton(EventPlayer(), Button.Ability1);
+            Wait(0.1);
+            StartHoldingButton(EventPlayer(), Button.PrimaryFire);
+            Wait(0.5);
+            if(IsDead(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))))
+            {
+                StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+                StopFacing(EventPlayer());
+                Wait(0.1);
+                StartFacing(
+                    EventPlayer(), 
+                    startPosition, 
+                    20000, 
+                    Relative.ToWorld, 
+                    FacingRev.DirectionAndTurnRate
+                );  
+                Wait(0.3);
+                StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+                Wait(0.2);
+                StopHoldingButton(EventPlayer(), Button.SecondaryFire);
+                Wait(0.1);
+                PressButton(EventPlayer(), Button.Jump);
+                Wait(1);   
+            } else{
+                Wait(2);
+            }
+            StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+            Wait(1);
+            Teleport(EventPlayer(), startPosition);
+        }
+        
+    }
+}

@@ -1,30 +1,24 @@
-import "Functions.del";
-
-define playervar behavior;
+/*
+* Overwatch Mod Tools
+* This file contains all the general behavior rules.
+*/
+import "Behaviors.del";
 
 // All Hero Behaviors
 rule: "BEHAVIOR: Stationary"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 0 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 0 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
 {
     resetBehaviors(EventPlayer());
 }
 
 rule: "BEHAVIOR: Strafe"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 1 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 1 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
 {
     define strafeLength = 0.3;
     define strafePosition = 0;
@@ -73,13 +67,9 @@ if (
 
 rule: "BEHAVIOR: Long Strafe"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 2 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 2 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
 {
     define strafeLength = 1;
     define strafePosition = 0;
@@ -128,13 +118,9 @@ if (
 
 rule: "BEHAVIOR: AD Spam"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 3 
-    && 
-    IsDummyBot(EventPlayer())
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 3 
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
 {
     define strafeLength = 0.05;
     define strafePosition = 0;
@@ -183,13 +169,9 @@ if (
 
 rule: "BEHAVIOR: Crouch Strafe"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 4 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 4 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
 {
     define strafeLength = 0.2;
     define strafePosition = 0;
@@ -242,207 +224,45 @@ if (
     }
 }
 
-// ORISA
-rule: "BEHAVIOR: ORISA: Deploy Shield on Cooldown"
+rule: "BEHAVIOR: Track Closest Enemy"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 201 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 6
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
 {
-    while(EventPlayer().behavior == 201)
+    while (EventPlayer().behavior == 6)
     {
-        PressButton(EventPlayer(), Button.Ability2);
-        Wait(10);
-    }
-}
-
-// REINHARDT
-rule: "BEHAVIOR: REINHARDT: Shield Up"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 301
-    && 
-    IsDummyBot(EventPlayer())
-    && 
-    IsGameInProgress()
-)
-{
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-}
-
-// SIGMA
-rule: "BEHAVIOR: SIGMA: Deploy Shield"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 501 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
-{
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-    Wait(1.5);
-    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-}
-
-// WINSTON
-rule: "BEHAVIOR: WINSTON: Deploy Bubble"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 601 
-    && 
-    IsDummyBot(EventPlayer())
-    && 
-    IsGameInProgress()
-)
-{
-    while(EventPlayer().behavior == 601)
-    {
-        PressButton(EventPlayer(), Button.Ability2);
-        Wait(13);
-    }
-}
-
-// WRECKING BALL
-rule: "BEHAVIOR: WRECKING BALL: Ball"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 701 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
-{
-    PressButton(EventPlayer(), Button.Ability1);
-}
-
-// ZARYA
-rule: "BEHAVIOR: ZARYA: Personal Bubble"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 801 
-    && 
-    IsDummyBot(EventPlayer())
-    && 
-    IsGameInProgress()
-)
-{
-    while(EventPlayer().behavior == 801)
-    {
-        PressButton(EventPlayer(), Button.Ability1);
-        Wait(10);
-    }
-}
-
-// BASTION
-rule: "BEHAVIOR: BASTION: Sentry"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 1001 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
-{
-    PressButton(EventPlayer(), Button.Ability1);
-}
-
-// DOOMFIST
-rule: "BEHAVIOR: DOOMFIST: Combo"
-Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 1101 
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
-{
-    define startPosition;
-    startPosition = PositionOf(EventPlayer());
-    while (EventPlayer().behavior == 1101)
-    {
-        if(
-            IsTrueForAny(
-                PlayersWithinRadius(EventPlayer(), 
-                15, 
-                OppositeTeamOf(TeamOf(EventPlayer())), 
-                RadiusLOS.Surfaces), 
-                ArrayElement() == ClosestPlayerTo(EventPlayer(), 
-                OppositeTeamOf(TeamOf(EventPlayer())))
-            ) 
-            && 
-            !IsDead(
-                ClosestPlayerTo(EventPlayer(), 
-                OppositeTeamOf(TeamOf(EventPlayer())))
-            )
-        )
-        {
-            StartFacing(
+        StartFacing(
+            EventPlayer(), 
+            DirectionTowards(
                 EventPlayer(), 
-                DirectionTowards(
-                    EventPlayer(), 
-                    ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
-                ), 
-                20000, 
-                Relative.ToWorld, 
-                FacingRev.DirectionAndTurnRate
-            );
-            PressButton(EventPlayer(), Button.Ability2);
-            Wait(1);
-            PressButton(EventPlayer(), Button.PrimaryFire);
-            Wait(0.1);
-            PressButton(EventPlayer(), Button.Ability1);
-            Wait(0.1);
-            StartHoldingButton(EventPlayer(), Button.PrimaryFire);
-            Wait(0.5);
-            if(IsDead(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))))
-            {
-                StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-                StopFacing(EventPlayer());
-                Wait(0.1);
-                StartFacing(
-                    EventPlayer(), 
-                    startPosition, 
-                    20000, 
-                    Relative.ToWorld, 
-                    FacingRev.DirectionAndTurnRate
-                );  
-                Wait(0.3);
-                StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-                Wait(0.2);
-                StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-                Wait(0.1);
-                PressButton(EventPlayer(), Button.Jump);
-                Wait(1);   
-            } else{
-                Wait(2);
-            }
-            StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-            Wait(1);
-            Teleport(EventPlayer(), startPosition);
-        }
-        
+                ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
+            ), 
+            20000, 
+            Relative.ToWorld, 
+            FacingRev.DirectionAndTurnRate
+        );
     }
 }
 
-// BRIGITTE
-rule: "BEHAVIOR: BRIGITTE: Shield"
+rule: "BEHAVIOR: Shoot Closest Enemy"
 Event.OngoingPlayer
-if (
-    EventPlayer().behavior == 2701
-    && 
-    IsDummyBot(EventPlayer()) 
-    && 
-    IsGameInProgress()
-)
+if (EventPlayer().behavior == 7
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
 {
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+    StartHoldingButton(EventPlayer(), Button.PrimaryFire);   
+    while (EventPlayer().behavior == 7)
+    {
+        StartFacing(
+            EventPlayer(), 
+            DirectionTowards(
+                EventPlayer(), 
+                ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
+            ), 
+            20000, 
+            Relative.ToWorld, 
+            FacingRev.DirectionAndTurnRate
+        );
+    }
 }

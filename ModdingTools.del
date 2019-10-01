@@ -1,5 +1,38 @@
 //Imports
-import "Behaviors.del";
+import "UI.del";
+//Behaviors
+import "Behaviors/All.del";
+import "Behaviors/Ana.del";
+import "Behaviors/Ashe.del";
+import "Behaviors/Baptiste.del";
+import "Behaviors/Bastion.del";
+import "Behaviors/Brigitte.del";
+import "Behaviors/Doomfist.del";
+import "Behaviors/Dva.del";
+import "Behaviors/Genji.del";
+import "Behaviors/Hanzo.del";
+import "Behaviors/Junkrat.del";
+import "Behaviors/Lucio.del";
+import "Behaviors/Mccree.del";
+import "Behaviors/Mei.del";
+import "Behaviors/Mercy.del";
+import "Behaviors/Moira.del";
+import "Behaviors/Orisa.del";
+import "Behaviors/Pharah.del";
+import "Behaviors/Reaper.del";
+import "Behaviors/Reinhardt.del";
+import "Behaviors/Roadhog.del";
+import "Behaviors/Sigma.del";
+import "Behaviors/Soldier76.del";
+import "Behaviors/Sombra.del";
+import "Behaviors/Symmetra.del";
+import "Behaviors/Torbjorn.del";
+import "Behaviors/Tracer.del";
+import "Behaviors/Widowmaker.del";
+import "Behaviors/Winston.del";
+import "Behaviors/WreckingBall.del";
+import "Behaviors/Zarya.del";
+import "Behaviors/Zenyatta.del";
 
 // Global Variables
 define globalvar heroes;
@@ -28,22 +61,7 @@ define playervar hitPlayer;
 define playervar initialPosition;
 define playervar initialFacing;
 
-// Player HUD Items
-define playervar modeMenu;
-define playervar pickHeroesMenu;
-define playervar buildHeroesMenu;
-define playervar botInfo1;
-define playervar botInfo2;
-define playervar botInfo3;
-define playervar botInfo4;
-define playervar botInfo5;
-define playervar botInfo6;
-define playervar botInfo7;
 
-// Player Effect Items
-define playervar cursor;
-define playervar selectionMarker;
-define playervar fixerEffect;
 
 rule: "SETUP: Setup global variables"
 Event.OngoingGlobal
@@ -194,194 +212,44 @@ if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
     {
         EventPlayer().isFlying = toggleFlying(EventPlayer(), EventPlayer().isFlying);
     }
-    Wait(0.25);
-    
+    Wait(0.25);   
 }
 
 rule: "MODE: Play Mode"
 Event.OngoingPlayer
 if (EventPlayer().mode == 0 && IsGameInProgress())
 {
-    DestroyHudText(botInfo1);
-    DestroyHudText(botInfo2);
-    DestroyHudText(botInfo3);
-    DestroyHudText(botInfo4);
-    DestroyHudText(botInfo5);
-    DestroyHudText(botInfo6);
-    DestroyHudText(botInfo7);
-
-    DestroyHudText(buildHeroesMenu);
-    DestroyEffect(selectionMarker);
-    DestroyHudText(pickHeroesMenu);
-    DestroyEffect(cursor);
-    DestroyHudText(modeMenu);
-    Wait(0.016);
-    CreateHudText(
-        EventPlayer(),
-        "Play", 
-        null, 
-        null, 
-        Location.Top, 
-        1, 
-        Color.White, 
-        Color.White, 
-        Color.White, 
-        StringRev.String, 
-        Spectators.VisibleNever
-    );
-    EventPlayer().modeMenu = LastTextID();
+    CleanHUD();
+    Wait(0.25);
+    CreateModeMenu(mode);
 }
 
 rule: "MODE: Pick Heroes"
 Event.OngoingPlayer
 if (EventPlayer().mode == 1 && IsGameInProgress())
 {
-    DestroyHudText(buildHeroesMenu);
-
+    CleanHUD();
+    Wait(0.025);
+    CreateModeMenu(mode);
+    CreatePickHeroMenu();
     CreateBotInfoHUD();
-
-    DestroyHudText(modeMenu);
-    Wait(0.016);
-    CreateHudText(
-        EventPlayer(),
-        "Pick Heroes", 
-        null, 
-        null, 
-        Location.Top, 
-        1, 
-        Color.Blue, 
-        Color.White, 
-        Color.White, 
-        StringRev.String, 
-        Spectators.VisibleNever
-    );
-    EventPlayer().modeMenu = LastTextID();
-
-    DestroyHudText(pickHeroesMenu);
-    CreateHudText(
-        EventPlayer(), 
-        HeroIconString(selectedHero), 
-        selectedTeam, 
-        selectedHero, 
-        Location.Top, 
-        2, 
-        Color.Blue, 
-        Color.Blue, 
-        Color.White, 
-        StringRev.String, 
-        Spectators.VisibleNever
-    );
-    EventPlayer().pickHeroesMenu = LastTextID();
-
-    DestroyEffect(cursor);
-    CreateEffect(
-        EventPlayer(), 
-        Effect.Ring, 
-        Color.Blue, 
-        EventPlayer().hitPosition,
-        1, 
-        EffectRev.PositionAndRadius
-    );
-    EventPlayer().cursor = LastCreatedEntity();
-
-    DestroyEffect(selectionMarker);
-    CreateEffect(
-        EventPlayer(),
-        Effect.Ring, 
-        Color.Green, 
-        EventPlayer().selectedPlayer, 
-        1.5, 
-        EffectRev.PositionAndRadius
-    );
-    EventPlayer().selectionMarker = LastCreatedEntity();
-
-    // Fixes bug where 1 element isn't rendered on first mode switch
-    if (fixerEffect == 0 || fixerEffect == null)
-    {
-        DestroyEffect(fixerEffect);
-        CreateEffect(EventPlayer(), Effect.Orb, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
-        EventPlayer().fixerEffect = LastCreatedEntity();
-    }
-
+    CreateCursor(mode);
+    CreateSelectionMarker();
+    //FixEffects();
 }
 
 rule: "MODE: Build Heroes"
 Event.OngoingPlayer
 if (EventPlayer().mode == 2 && IsGameInProgress())
 {
-    DestroyHudText(pickHeroesMenu);
-    DestroyHudText(modeMenu);
-
+    CleanHUD();
+    Wait(0.025);
+    CreateModeMenu(mode);
+    CreateBuildHeroMenu();
     CreateBotInfoHUD();
-
-    Wait(0.016);
-    CreateHudText(
-        EventPlayer(),
-        "Build Heroes", 
-        null, 
-        null, 
-        Location.Top, 
-        1, 
-        Color.Orange, 
-        Color.White, 
-        Color.White, 
-        StringRev.String, 
-        Spectators.VisibleNever
-    );
-    EventPlayer().modeMenu = LastTextID();
-
-    DestroyHudText(buildHeroesMenu);
-    CreateHudText(
-        EventPlayer(), 
-        HeroIconString(HeroOf(selectedPlayer)), 
-        "Selected Ability",
-        behaviors[behaviorIndex], 
-        Location.Top, 
-        2, 
-        Color.Orange, 
-        Color.Orange, 
-        Color.White, 
-        StringRev.String, 
-        Spectators.VisibleNever
-    );
-    EventPlayer().buildHeroesMenu = LastTextID();
-
-    DestroyEffect(cursor);
-    CreateEffect(
-        EventPlayer(),
-        Effect.Ring, 
-        Color.Orange, 
-        EventPlayer().hitPosition,
-        1, 
-        EffectRev.PositionAndRadius
-    );
-    EventPlayer().cursor = LastCreatedEntity();
-
-    DestroyEffect(selectionMarker);
-    CreateEffect(
-        EventPlayer(), 
-        Effect.Ring, 
-        Color.Green, 
-        EventPlayer().selectedPlayer, 
-        1.5, 
-        EffectRev.PositionAndRadius
-    );
-    EventPlayer().selectionMarker = LastCreatedEntity();
-
-    // Fixes bug where 1 element isn't rendered on first mode switch
-    if (fixerEffect == 0 || fixerEffect == null)
-    {
-        DestroyEffect(fixerEffect);
-        CreateEffect(
-            EventPlayer(), 
-            Effect.Orb, 
-            Color.Blue, 
-            EventPlayer().hitPosition, 
-            1, 
-            EffectRev.PositionAndRadius
-        );
-        EventPlayer().fixerEffect = LastCreatedEntity();
-    }
+    CreateCursor(mode);
+    CreateSelectionMarker();
+    //FixEffects();
 }
 
 rule: "FUNCTION: Fly"
@@ -434,13 +302,14 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && IsButtonHeld(EventPlayer(
     if(CountOf(AllPlayers(selectedTeam)) < 6)
     {
         CreateDummyBot(selectedHero, selectedTeam, -1, hitPosition, FacingDirectionOf(EventPlayer()));
-        Wait(0.05);
+        Wait(0.1);
         EventPlayer().selectedPlayer = AllPlayers()[0];
         selectedPlayer.behavior = 0;
         selectedPlayer.initialPosition = PositionOf(selectedPlayer);
         selectedPlayer.initialFacing = FacingDirectionOf(selectedPlayer);
         PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.Green, selectedPlayer, 1);
         PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.White, EventPlayer().flyPosition, 100);
+        Wait(0.05);
     }
 }
 
@@ -570,6 +439,31 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), 
     selectedPlayer.behavior = behaviors[behaviorIndex];
 }
 
+rule: "BUILD HEROES: SaveBot"
+Event.OngoingPlayer
+if (
+    IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && 
+    IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && 
+    IsGameInProgress() 
+    && 
+    EventPlayer().mode == 2
+)
+{
+    define bot;
+    bot = new Bot(
+        HeroOf(selectedPlayer), 
+        SlotOf(selectedPlayer), 
+        TeamOf(selectedPlayer), 
+        selectedPlayer.behavior, 
+        selectedPlayer.initialPosition, 
+        selectedPlayer.initialFacing
+    );
+    Append(savedBots, bot);
+    SmallMessage(EventPlayer(), <"Hero: <0> Saved", HeroOf(selectedPlayer)>);
+}
+
 rule: "FUNCTION: Destroy bot on death"
 Event.OngoingPlayer
 if (IsDead(EventPlayer()) && IsDummyBot(EventPlayer()))
@@ -599,7 +493,7 @@ class Bot
     public define botInitialPosition;
     public define botInitialFacing;
 
-    public Bot(define inHero, define inSlot, define inTeam, define inBehavior, define inBehavior, define inPosition, define inFacing)
+    public Bot(define inHero, define inSlot, define inTeam, define inBehavior, define inPosition, define inFacing)
     {
         botHero = inHero;
         botSlot = inSlot;
@@ -609,10 +503,6 @@ class Bot
         botInitialFacing = inFacing;
     }
 
-    public method saveBot() 
-    {
-        Append(savedBots, this);
-    }
 }
 
 method toggleFlying(define player, define flying)
@@ -672,119 +562,3 @@ method disableAbilities(define player)
 
 }
 
-method CreateBotInfoHUD()
-{
-    DestroyHudText(botInfo1);
-    DestroyHudText(botInfo2);
-    DestroyHudText(botInfo3);
-    DestroyHudText(botInfo4);
-    DestroyHudText(botInfo5);
-    DestroyHudText(botInfo6);
-    DestroyHudText(botInfo7);
-
-    CreateHudText(
-        EventPlayer(),
-        <"Selected Player">,
-        null,
-        null,
-        Location.Left,
-        1,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo1 = LastTextID();
-
-    CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Position: <0>", selectedPlayer.initialPosition>,
-        Location.Left,
-        2,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo2 = LastTextID();
-    
-    CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Facing: <0>", selectedPlayer.initialFacing>,
-        Location.Left,
-        3,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo3 = LastTextID();
-
-    CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Hero: <0>", HeroOf(selectedPlayer)>,
-        Location.Left,
-        4,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-
-    EventPlayer().botInfo4 = LastTextID();
-
-        CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Team: <0>", TeamOf(selectedPlayer)>,
-        Location.Left,
-        5,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo5 = LastTextID();
-
-        CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Point: <0>", SlotOf(selectedPlayer)>,
-        Location.Left,
-        6,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo6 = LastTextID();
-
-        CreateHudText(
-        EventPlayer(),
-        null,
-        null,
-        <"Ability: <0>", selectedPlayer.behavior>,
-        Location.Left,
-        7,
-        Color.Orange,
-        Color.White,
-        Color.White,
-        StringRev.String,
-        Spectators.VisibleNever
-    );
-    EventPlayer().botInfo7 = LastTextID();
-}

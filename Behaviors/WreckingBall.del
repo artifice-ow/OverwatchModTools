@@ -1,0 +1,14 @@
+import "Behaviors.del";
+// WRECKING BALL
+rule: "BEHAVIOR: WRECKING BALL: Ball"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 701 
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    PressButton(EventPlayer(), Button.Ability1);
+}

@@ -1,0 +1,7 @@
+/*
+* Overwatch Mod Tools
+* This file is the base file for all behavior files.
+*/
+import "../Functions.del";
+
+define playervar behavior;

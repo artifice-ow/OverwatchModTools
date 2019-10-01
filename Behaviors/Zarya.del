@@ -1,0 +1,18 @@
+import "Behaviors.del";
+// ZARYA
+rule: "BEHAVIOR: ZARYA: Personal Bubble"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 801 
+    && 
+    IsDummyBot(EventPlayer())
+    && 
+    IsGameInProgress()
+)
+{
+    while(EventPlayer().behavior == 801)
+    {
+        PressButton(EventPlayer(), Button.Ability1);
+        Wait(10);
+    }
+}

@@ -1,0 +1,14 @@
+import "Behaviors.del";
+// REINHARDT
+rule: "BEHAVIOR: REINHARDT: Shield Up"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 301
+    && 
+    IsDummyBot(EventPlayer())
+    && 
+    IsGameInProgress()
+)
+{
+    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+}

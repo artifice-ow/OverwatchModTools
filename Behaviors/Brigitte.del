@@ -1,0 +1,14 @@
+import "Behaviors.del";
+// BRIGITTE
+rule: "BEHAVIOR: BRIGITTE: Shield"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 2701
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+}
