@@ -66,7 +66,7 @@ if (EventPlayer().behavior == 7
     && IsGameInProgress())
 {
     TrackClosestEnemy();
-    StartShooting();   
+    StartShooting(EventPlayer());
 }
 
 rule: "BEHAVIOR: Strafe and Shoot"
@@ -76,6 +76,6 @@ if (EventPlayer().behavior == 8
     && IsGameInProgress())
 {
     TrackClosestEnemy();
-    StartShooting();
+    StartShooting(EventPlayer());
     StartStrafe(0.3);
 }

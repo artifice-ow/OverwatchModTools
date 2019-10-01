@@ -60,6 +60,7 @@ define playervar hitPosition;
 define playervar hitPlayer;
 define playervar initialPosition;
 define playervar initialFacing;
+define playervar lastCreatedBot;
 
 
 
@@ -298,25 +299,32 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsBut
 
 rule: "PICK HEROES: Place Heroes"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1)
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if(CountOf(AllPlayers(selectedTeam)) < 6)
     {
         CreateDummyBot(selectedHero, selectedTeam, -1, hitPosition, FacingDirectionOf(EventPlayer()));
+        lastCreatedBot = LastCreatedEntity();
         Wait(0.1);
-        EventPlayer().selectedPlayer = AllPlayers()[0];
+        EventPlayer().selectedPlayer = lastCreatedBot;
         selectedPlayer.behavior = 0;
         selectedPlayer.initialPosition = PositionOf(selectedPlayer);
         selectedPlayer.initialFacing = FacingDirectionOf(selectedPlayer);
         PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.Green, selectedPlayer, 1);
         PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.White, EventPlayer().flyPosition, 100);
-        Wait(0.05);
+        Wait(0.1);
     }
 }
 
 rule: "PICK HEROES: Select Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
@@ -327,7 +335,10 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer
 
 rule: "PICK HEROES: Move Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     Teleport(EventPlayer().selectedPlayer, hitPosition);
     selectedPlayer.initialPosition = PositionOf(selectedPlayer);
@@ -335,7 +346,10 @@ if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlay
 
 rule: "PICK HEROES: Delete Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     DestroyDummyBot(TeamOf(selectedPlayer), SlotOf(selectedPlayer));
     PlayEffect(EventPlayer(), PlayEffect.BadPickupEffect, Color.Red, selectedPlayer, 1);
@@ -349,7 +363,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), 
 
 rule: "PICK HEROES: Set facing"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     SetFacing(selectedPlayer, hitPosition - EyePosition(selectedPlayer), Relative.ToWorld);
     selectedPlayer.initialFacing = FacingDirectionOf(selectedPlayer);
@@ -357,7 +374,10 @@ if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlaye
 
 rule: "PICK HEROES: Change Team"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if(selectedTeam == Team.Team1)
     {
@@ -371,7 +391,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsButtonHeld(EventPlayer(), 
 
 rule: "BUILD HEROES: Select Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
@@ -382,7 +405,10 @@ if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer
 
 rule: "BUILD HEROES: Cycle Behaviors - Forward"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsGameInProgress() 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && EventPlayer().mode == 2)
 {
     if (behaviorIndex >= CountOf(behaviors) - 1)
     {
@@ -442,15 +468,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), 
 
 rule: "BUILD HEROES: SaveBot"
 Event.OngoingPlayer
-if (
-    IsButtonHeld(EventPlayer(), Button.Ability2) 
-    && 
-    IsButtonHeld(EventPlayer(), Button.Ability1) 
-    && 
-    IsGameInProgress() 
-    && 
-    EventPlayer().mode == 2
-)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
     define bot;
     bot = new Bot(
@@ -467,7 +488,8 @@ if (
 
 rule: "FUNCTION: Destroy bot on death"
 Event.OngoingPlayer
-if (IsDead(EventPlayer()) && IsDummyBot(EventPlayer()))
+if (IsDead(EventPlayer()) 
+    && IsDummyBot(EventPlayer()))
 {
     DestroyDummyBot(TeamOf(EventPlayer()), SlotOf(EventPlayer()));
 }

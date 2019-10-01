@@ -17,7 +17,7 @@ method StartStrafe(define strafeLength)
         ThrottleBehavior.ReplaceExistingThrottle, 
         ThrottleRev.DirectionAndMagnitude
     );
-    while(EventPlayer().behavior == 1)
+    while(true)
     {
         if (strafePosition >= strafeLength)
         {
@@ -63,7 +63,7 @@ method StartCrouchStrafe(define strafeLength)
         ThrottleBehavior.ReplaceExistingThrottle, 
         ThrottleRev.DirectionAndMagnitude
     );
-    while(EventPlayer().behavior == 4)
+    while(true)
     {
         if (strafePosition >= strafeLength)
         {
@@ -110,7 +110,7 @@ method TrackClosestEnemy()
         EventPlayer(), 
         DirectionTowards(
             EventPlayer(), 
-            EyePosition(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer()))))
+            ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer()))) - Vector(0, 0.1, 0)
         ), 
         20000, 
         Relative.ToWorld, 
@@ -124,7 +124,7 @@ method StartShooting(define player)
     {
         while(true)
         {
-            PressButton(player, Botton.PrimaryFire);
+            PressButton(player, Button.PrimaryFire);
         }
     }
     else if (HeroOf(player) == Hero.Moira)
