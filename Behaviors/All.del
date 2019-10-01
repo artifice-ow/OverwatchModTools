@@ -20,49 +20,7 @@ if (EventPlayer().behavior == 1
     && IsDummyBot(EventPlayer()) 
     && IsGameInProgress())
 {
-    define strafeLength = 0.3;
-    define strafePosition = 0;
-    StartThrottleInDirection(
-        EventPlayer(), 
-        Vector(1,0,0), 
-        1, 
-        Relative.ToPlayer, 
-        ThrottleBehavior.ReplaceExistingThrottle, 
-        ThrottleRev.DirectionAndMagnitude
-    );
-    while(EventPlayer().behavior == 1)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(-1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
+    StartStrafe(0.3);
 }
 
 rule: "BEHAVIOR: Long Strafe"
@@ -71,49 +29,7 @@ if (EventPlayer().behavior == 2
     && IsDummyBot(EventPlayer()) 
     && IsGameInProgress())
 {
-    define strafeLength = 1;
-    define strafePosition = 0;
-    StartThrottleInDirection(
-        EventPlayer(), 
-        Vector(1,0,0), 
-        1, 
-        Relative.ToPlayer, 
-        ThrottleBehavior.ReplaceExistingThrottle, 
-        ThrottleRev.DirectionAndMagnitude
-    );
-    while(EventPlayer().behavior == 2)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(-1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle,
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
+    StartStrafe(1);
 }
 
 rule: "BEHAVIOR: AD Spam"
@@ -122,49 +38,7 @@ if (EventPlayer().behavior == 3
     && IsDummyBot(EventPlayer())
     && IsGameInProgress())
 {
-    define strafeLength = 0.05;
-    define strafePosition = 0;
-    StartThrottleInDirection(
-        EventPlayer(),
-        Vector(1,0,0),
-        1,
-        Relative.ToPlayer,
-        ThrottleBehavior.ReplaceExistingThrottle,
-        ThrottleRev.DirectionAndMagnitude
-    );
-    while(EventPlayer().behavior == 3)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(-1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
+    StartStrafe(0.05);
 }
 
 rule: "BEHAVIOR: Crouch Strafe"
@@ -173,55 +47,7 @@ if (EventPlayer().behavior == 4
     && IsDummyBot(EventPlayer()) 
     && IsGameInProgress())
 {
-    define strafeLength = 0.2;
-    define strafePosition = 0;
-    StartThrottleInDirection(
-        EventPlayer(), 
-        Vector(1,0,0), 
-        1, 
-        Relative.ToPlayer, 
-        ThrottleBehavior.ReplaceExistingThrottle, 
-        ThrottleRev.DirectionAndMagnitude
-    );
-    while(EventPlayer().behavior == 4)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StopHoldingButton(EventPlayer(), Button.Crouch);
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(-1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StopHoldingButton(EventPlayer(), Button.Crouch);
-            StartThrottleInDirection(
-                EventPlayer(), 
-                Vector(1,0,0), 
-                1, 
-                Relative.ToPlayer, 
-                ThrottleBehavior.ReplaceExistingThrottle, 
-                ThrottleRev.DirectionAndMagnitude
-            );
-        }
-        if (strafePosition > 0 - 0.03 && strafePosition < 0 + 0.03)
-        {
-            StartHoldingButton(EventPlayer(), Button.Crouch);
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
+    StartCrouchStrafe(0.3);
 }
 
 rule: "BEHAVIOR: Track Closest Enemy"
@@ -230,19 +56,7 @@ if (EventPlayer().behavior == 6
     && IsDummyBot(EventPlayer())
     && IsGameInProgress())
 {
-    while (EventPlayer().behavior == 6)
-    {
-        StartFacing(
-            EventPlayer(), 
-            DirectionTowards(
-                EventPlayer(), 
-                ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
-            ), 
-            20000, 
-            Relative.ToWorld, 
-            FacingRev.DirectionAndTurnRate
-        );
-    }
+    TrackClosestEnemy();
 }
 
 rule: "BEHAVIOR: Shoot Closest Enemy"
@@ -251,18 +65,17 @@ if (EventPlayer().behavior == 7
     && IsDummyBot(EventPlayer())
     && IsGameInProgress())
 {
-    StartHoldingButton(EventPlayer(), Button.PrimaryFire);   
-    while (EventPlayer().behavior == 7)
-    {
-        StartFacing(
-            EventPlayer(), 
-            DirectionTowards(
-                EventPlayer(), 
-                ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer())))
-            ), 
-            20000, 
-            Relative.ToWorld, 
-            FacingRev.DirectionAndTurnRate
-        );
-    }
+    TrackClosestEnemy();
+    StartShooting();   
+}
+
+rule: "BEHAVIOR: Strafe and Shoot"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 8
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    TrackClosestEnemy();
+    StartShooting();
+    StartStrafe(0.3);
 }

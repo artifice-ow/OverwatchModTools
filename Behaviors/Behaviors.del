@@ -5,3 +5,134 @@
 import "../Functions.del";
 
 define playervar behavior;
+
+method StartStrafe(define strafeLength)
+{
+    define strafePosition = 0;
+    StartThrottleInDirection(
+        EventPlayer(), 
+        Vector(1,0,0), 
+        1, 
+        Relative.ToPlayer, 
+        ThrottleBehavior.ReplaceExistingThrottle, 
+        ThrottleRev.DirectionAndMagnitude
+    );
+    while(EventPlayer().behavior == 1)
+    {
+        if (strafePosition >= strafeLength)
+        {
+            StartThrottleInDirection(
+                EventPlayer(), 
+                Vector(-1,0,0), 
+                1, 
+                Relative.ToPlayer, 
+                ThrottleBehavior.ReplaceExistingThrottle, 
+                ThrottleRev.DirectionAndMagnitude
+            );
+        }
+        else if (strafePosition <= -strafeLength)
+        {
+            StartThrottleInDirection(
+                EventPlayer(), 
+                Vector(1,0,0), 
+                1, 
+                Relative.ToPlayer, 
+                ThrottleBehavior.ReplaceExistingThrottle, 
+                ThrottleRev.DirectionAndMagnitude
+            );
+        }
+        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
+        {
+            strafePosition += 0.016;
+        }
+        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
+        {
+            strafePosition -= 0.016;
+        }
+    }
+}
+
+method StartCrouchStrafe(define strafeLength)
+{
+    define strafePosition = 0;
+    StartThrottleInDirection(
+        EventPlayer(), 
+        Vector(1,0,0), 
+        1, 
+        Relative.ToPlayer, 
+        ThrottleBehavior.ReplaceExistingThrottle, 
+        ThrottleRev.DirectionAndMagnitude
+    );
+    while(EventPlayer().behavior == 4)
+    {
+        if (strafePosition >= strafeLength)
+        {
+            StopHoldingButton(EventPlayer(), Button.Crouch);
+            StartThrottleInDirection(
+                EventPlayer(), 
+                Vector(-1,0,0), 
+                1, 
+                Relative.ToPlayer, 
+                ThrottleBehavior.ReplaceExistingThrottle, 
+                ThrottleRev.DirectionAndMagnitude
+            );
+        }
+        else if (strafePosition <= -strafeLength)
+        {
+            StopHoldingButton(EventPlayer(), Button.Crouch);
+            StartThrottleInDirection(
+                EventPlayer(), 
+                Vector(1,0,0), 
+                1, 
+                Relative.ToPlayer, 
+                ThrottleBehavior.ReplaceExistingThrottle, 
+                ThrottleRev.DirectionAndMagnitude
+            );
+        }
+        if (strafePosition > 0 - 0.03 && strafePosition < 0 + 0.03)
+        {
+            StartHoldingButton(EventPlayer(), Button.Crouch);
+        }
+        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
+        {
+            strafePosition += 0.016;
+        }
+        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
+        {
+            strafePosition -= 0.016;
+        }
+    }
+}
+
+method TrackClosestEnemy()
+{
+    StartFacing(
+        EventPlayer(), 
+        DirectionTowards(
+            EventPlayer(), 
+            EyePosition(ClosestPlayerTo(EventPlayer(), OppositeTeamOf(TeamOf(EventPlayer()))))
+        ), 
+        20000, 
+        Relative.ToWorld, 
+        FacingRev.DirectionAndTurnRate
+    );
+}
+
+method StartShooting(define player)
+{
+    if (HeroOf(player) == Hero.Ashe)
+    {
+        while(true)
+        {
+            PressButton(player, Botton.PrimaryFire);
+        }
+    }
+    else if (HeroOf(player) == Hero.Moira)
+    {
+        StartHoldingButton(player, Button.SecondaryFire);
+    }
+    else
+    {
+        StartHoldingButton(player, Button.PrimaryFire);
+    }
+}
