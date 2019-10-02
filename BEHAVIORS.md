@@ -6,8 +6,10 @@
 | Long Strafe   | 2 |
 | AD Spam       | 3 |
 | Crouch Strafe | 4 |
+| Long Crouch Strafe | 5 |
 | Track Closest Enemy | 6 |
 | Shoot Closest Enemy | 7 |
+| Strafe and Shoot | 8 |
 
 ## Orisa
 | Behavior | ID |
