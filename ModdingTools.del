@@ -1,3 +1,39 @@
+//Imports
+import "UI.del";
+//Behaviors
+import "Behaviors/All.del";
+import "Behaviors/Ana.del";
+import "Behaviors/Ashe.del";
+import "Behaviors/Baptiste.del";
+import "Behaviors/Bastion.del";
+import "Behaviors/Brigitte.del";
+import "Behaviors/Doomfist.del";
+import "Behaviors/Dva.del";
+import "Behaviors/Genji.del";
+import "Behaviors/Hanzo.del";
+import "Behaviors/Junkrat.del";
+import "Behaviors/Lucio.del";
+import "Behaviors/Mccree.del";
+import "Behaviors/Mei.del";
+import "Behaviors/Mercy.del";
+import "Behaviors/Moira.del";
+import "Behaviors/Orisa.del";
+import "Behaviors/Pharah.del";
+import "Behaviors/Reaper.del";
+import "Behaviors/Reinhardt.del";
+import "Behaviors/Roadhog.del";
+import "Behaviors/Sigma.del";
+import "Behaviors/Soldier76.del";
+import "Behaviors/Sombra.del";
+import "Behaviors/Symmetra.del";
+import "Behaviors/Torbjorn.del";
+import "Behaviors/Tracer.del";
+import "Behaviors/Widowmaker.del";
+import "Behaviors/Winston.del";
+import "Behaviors/WreckingBall.del";
+import "Behaviors/Zarya.del";
+import "Behaviors/Zenyatta.del";
+
 // Global Variables
 define globalvar heroes;
 define globalvar modes;
@@ -7,9 +43,12 @@ define globalvar flySpeed;
 define globalvar boostSpeed;
 define globalvar cameraSmoothing;
 
+define globalvar savedBots;
+
+define globalvar map;
+
 // Player Variables
 define playervar mode;
-define playervar behavior;
 define playervar isFlying;
 define playervar hasAbilities;
 define playervar heroIndex;
@@ -21,16 +60,11 @@ define playervar flyPosition;
 define playervar facingDirection;
 define playervar hitPosition;
 define playervar hitPlayer;
+define playervar initialPosition;
+define playervar initialFacing;
+define playervar lastCreatedBot;
 
-// Player HUD Items
-define playervar modeMenu;
-define playervar pickHeroesMenu;
-define playervar buildHeroesMenu;
 
-// Player Effect Items
-define playervar cursor;
-define playervar selectionMarker;
-define playervar fixerEffect;
 
 rule: "SETUP: Setup global variables"
 Event.OngoingGlobal
@@ -78,6 +112,8 @@ Event.OngoingGlobal
         Hero.Zenyatta
         ];
     
+    savedBots = [];
+
     // Setup Modes
     modes = [
         // Play Mode
@@ -95,6 +131,10 @@ Event.OngoingGlobal
         2,
         3,
         4,
+        5,
+        6,
+        7,
+        8,
         201,
         301,
         501,
@@ -102,8 +142,11 @@ Event.OngoingGlobal
         701,
         801,
         1001,
+        1101,
         2701
     ];
+
+    map = GetMap();
 }
 
 rule: "SETUP: Set player properties"
@@ -134,9 +177,17 @@ if (IsInSetup())
     SetMatchTime(0);
 }
 
+rule: "SETUP: Remove Scoring"
+Event.OngoingGlobal
+if (IsGameInProgress())
+{
+    DisableScoring();
+}
+
 rule: "FUNCTION: Switch Mode"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
+if (IsButtonHeld(EventPlayer(), Button.Interact) 
+    && IsGameInProgress())
 {
     define prevmode;
     prevmode = EventPlayer().mode;
@@ -176,91 +227,53 @@ if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
     {
         EventPlayer().isFlying = toggleFlying(EventPlayer(), EventPlayer().isFlying);
     }
-    Wait(0.25);
-    
+    Wait(0.25);   
 }
 
 rule: "MODE: Play Mode"
 Event.OngoingPlayer
-if (EventPlayer().mode == 0 && IsGameInProgress())
+if (EventPlayer().mode == 0 
+    && IsGameInProgress())
 {
-    DestroyHudText(buildHeroesMenu);
-    DestroyEffect(selectionMarker);
-    DestroyHudText(pickHeroesMenu);
-    DestroyEffect(cursor);
-    DestroyHudText(modeMenu);
-    Wait(0.016);
-    CreateHudText(EventPlayer(),"Play", null, null, Location.Top, 1, Color.White, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
-    EventPlayer().modeMenu = LastTextID();
-
+    CleanHUD();
+    Wait(0.25);
+    CreateModeMenu(mode);
 }
 
 rule: "MODE: Pick Heroes"
 Event.OngoingPlayer
-if (EventPlayer().mode == 1 && IsGameInProgress())
+if (EventPlayer().mode == 1 
+    && IsGameInProgress())
 {
-    DestroyHudText(buildHeroesMenu);
-    DestroyHudText(modeMenu);
-    Wait(0.016);
-    CreateHudText(EventPlayer(),"Pick Heroes", null, null, Location.Top, 1, Color.Blue, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
-    EventPlayer().modeMenu = LastTextID();
-
-    DestroyHudText(pickHeroesMenu);
-    CreateHudText(EventPlayer(), HeroIconString(selectedHero), selectedTeam, selectedHero, Location.Top, 2, Color.Blue, Color.Blue, Color.White, StringRev.String, Spectators.VisibleNever);
-    EventPlayer().pickHeroesMenu = LastTextID();
-
-    DestroyEffect(cursor);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
-    EventPlayer().cursor = LastCreatedEntity();
-
-    DestroyEffect(selectionMarker);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Green, EventPlayer().selectedPlayer, 1.5, EffectRev.PositionAndRadius);
-    EventPlayer().selectionMarker = LastCreatedEntity();
-
-    // Fixes bug where 1 element isn't rendered on first mode switch
-    if (fixerEffect == 0 || fixerEffect == null)
-    {
-        DestroyEffect(fixerEffect);
-        CreateEffect(EventPlayer(), Effect.Orb, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
-        EventPlayer().fixerEffect = LastCreatedEntity();
-    }
-
+    CleanHUD();
+    Wait(0.025);
+    CreateModeMenu(mode);
+    CreatePickHeroMenu();
+    CreateBotInfoHUD();
+    CreateCursor(mode);
+    CreateSelectionMarker();
+    //FixEffects();
 }
 
 rule: "MODE: Build Heroes"
 Event.OngoingPlayer
-if (EventPlayer().mode == 2 && IsGameInProgress())
+if (EventPlayer().mode == 2 
+    && IsGameInProgress())
 {
-    DestroyHudText(pickHeroesMenu);
-    DestroyHudText(modeMenu);
-    Wait(0.016);
-    CreateHudText(EventPlayer(),"Build Heroes", null, null, Location.Top, 1, Color.Orange, Color.White, Color.White, StringRev.String, Spectators.VisibleNever);
-    EventPlayer().modeMenu = LastTextID();
-
-    DestroyHudText(buildHeroesMenu);
-    CreateHudText(EventPlayer(), HeroIconString(HeroOf(selectedPlayer)), "Selected Ability", behaviors[behaviorIndex], Location.Top, 2, Color.Orange, Color.Orange, Color.White, StringRev.String, Spectators.VisibleNever);
-    EventPlayer().buildHeroesMenu = LastTextID();
-
-    DestroyEffect(cursor);
-    CreateEffect(EventPlayer(),Effect.Ring, Color.Orange, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
-    EventPlayer().cursor = LastCreatedEntity();
-
-    DestroyEffect(selectionMarker);
-    CreateEffect(EventPlayer(), Effect.Ring, Color.Green, EventPlayer().selectedPlayer, 1.5, EffectRev.PositionAndRadius);
-    EventPlayer().selectionMarker = LastCreatedEntity();
-
-    // Fixes bug where 1 element isn't rendered on first mode switch
-    if (fixerEffect == 0 || fixerEffect == null)
-    {
-        DestroyEffect(fixerEffect);
-        CreateEffect(EventPlayer(), Effect.Orb, Color.Blue, EventPlayer().hitPosition, 1, EffectRev.PositionAndRadius);
-        EventPlayer().fixerEffect = LastCreatedEntity();
-    }
+    CleanHUD();
+    Wait(0.025);
+    CreateModeMenu(mode);
+    CreateBuildHeroMenu();
+    CreateBotInfoHUD();
+    CreateCursor(mode);
+    CreateSelectionMarker();
+    //FixEffects();
 }
 
 rule: "FUNCTION: Fly"
 Event.OngoingPlayer
-if (EventPlayer().isFlying && IsGameInProgress())
+if (EventPlayer().isFlying 
+    && IsGameInProgress())
 {
     while (EventPlayer().isFlying)
     {
@@ -273,7 +286,10 @@ if (EventPlayer().isFlying && IsGameInProgress())
 
 rule: "PICK HEROES: Cycle Heroes - Forward"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (heroIndex >= CountOf(heroes) - 1)
     {
@@ -288,7 +304,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsBut
 
 rule: "PICK HEROES: Cycle Heroes - Back"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (heroIndex <= 0)
     {
@@ -303,45 +322,62 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsBut
 
 rule: "PICK HEROES: Place Heroes"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1)
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if(CountOf(AllPlayers(selectedTeam)) < 6)
     {
         CreateDummyBot(selectedHero, selectedTeam, -1, hitPosition, FacingDirectionOf(EventPlayer()));
-        Wait(0.05);
-        EventPlayer().selectedPlayer = AllPlayers()[0];
+        lastCreatedBot = LastCreatedEntity();
+        Wait(0.1);
+        EventPlayer().selectedPlayer = lastCreatedBot;
         selectedPlayer.behavior = 0;
+        selectedPlayer.initialPosition = PositionOf(selectedPlayer);
+        selectedPlayer.initialFacing = FacingDirectionOf(selectedPlayer);
         PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.Green, selectedPlayer, 1);
-        PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.BuffExplosionSound, Color.White, EventPlayer().flyPosition, 100);
+        Wait(0.1);
     }
 }
 
 rule: "PICK HEROES: Select Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
         EventPlayer().selectedPlayer = hitPlayer;
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, selectedPlayer, 1.5);
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, PositionOf(selectedPlayer), 3.5);
     }
 }
 
 rule: "PICK HEROES: Move Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     Teleport(EventPlayer().selectedPlayer, hitPosition);
+    Wait(0.05);
+    selectedPlayer.initialPosition = PositionOf(selectedPlayer);
 }
 
 rule: "PICK HEROES: Delete Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     DestroyDummyBot(TeamOf(selectedPlayer), SlotOf(selectedPlayer));
     PlayEffect(EventPlayer(), PlayEffect.BadPickupEffect, Color.Red, selectedPlayer, 1);
-    PlayEffect(EventPlayer(), PlayEffect.DebuffImpactSound, Color.Red, EventPlayer(), 100);
+    PlayEffect(EventPlayer(), PlayEffect.ExplosionSound, Color.White, EventPlayer().flyPosition, 100);
     Wait(0.5);
     if(EventPlayer() != AllPlayers()[0])
     {
@@ -351,14 +387,21 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), 
 
 rule: "PICK HEROES: Set facing"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.SecondaryFire) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     SetFacing(selectedPlayer, hitPosition - EyePosition(selectedPlayer), Relative.ToWorld);
+    selectedPlayer.initialFacing = FacingDirectionOf(selectedPlayer);
 }
 
 rule: "PICK HEROES: Change Team"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if(selectedTeam == Team.Team1)
     {
@@ -372,19 +415,24 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsButtonHeld(EventPlayer(), 
 
 rule: "BUILD HEROES: Select Player"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) && !IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
     if (IsTrueForAny(heroes, ArrayElement() == HeroOf(hitPlayer)))
     {
         EventPlayer().selectedPlayer = hitPlayer;
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, selectedPlayer, 1.5);
-        PlayEffect(EventPlayer(), PlayEffect.RingExplosionSound, Color.Green, EventPlayer(), 100);
+        PlayEffect(EventPlayer(), PlayEffect.RingExplosion, Color.Green, PositionOf(selectedPlayer), 3.5);
     }
 }
 
 rule: "BUILD HEROES: Cycle Behaviors - Forward"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsGameInProgress() 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && EventPlayer().mode == 2)
 {
     if (behaviorIndex >= CountOf(behaviors) - 1)
     {
@@ -394,7 +442,8 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsBut
     {
         behaviorIndex++;
     }
-    while(RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != 0 && RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != IndexOfArrayValue(heroes, HeroOf(EventPlayer().selectedPlayer)) + 1)
+    while(RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != 0 
+        && RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != IndexOfArrayValue(heroes, HeroOf(EventPlayer().selectedPlayer)) + 1)
     {
         if (behaviorIndex >= CountOf(behaviors) - 1)
         {
@@ -410,7 +459,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsBut
 
 rule: "BUILD HEROES: Cycle Behaviors - Back"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsGameInProgress() 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && EventPlayer().mode == 2)
 {
     if (behaviorIndex <= 0)
     {
@@ -435,217 +487,40 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsBut
 
 rule: "BUILD HEROES: Apply Behavior"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
     PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.SkyBlue, selectedPlayer, 1);
+    resetBehaviors(selectedPlayer);
     selectedPlayer.behavior = behaviors[behaviorIndex];
 }
 
-rule: "BEHAVIOR: Stationary"
+rule: "BUILD HEROES: SaveBot"
 Event.OngoingPlayer
-if (EventPlayer().behavior == 0 && IsDummyBot(EventPlayer()) && IsGameInProgress())
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
-    StopThrottleInDirection(EventPlayer());
-    StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-    StopHoldingButton(EventPlayer(), Button.Ability1);
-    StopHoldingButton(EventPlayer(), Button.Ability2);
-    StopHoldingButton(EventPlayer(), Button.Ultimate);
-    StopHoldingButton(EventPlayer(), Button.Crouch);
-    StopHoldingButton(EventPlayer(), Button.Jump);
-}
-
-rule: "BEHAVIOR: Strafe"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 1 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    define strafeLength = 0.3;
-    define strafePosition = 0;
-    StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-    while(EventPlayer().behavior == 1)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(-1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
-}
-
-rule: "BEHAVIOR: Long Strafe"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 2 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    define strafeLength = 1;
-    define strafePosition = 0;
-    StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-    while(EventPlayer().behavior == 2)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(-1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
-}
-
-rule: "BEHAVIOR: AD Spam"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 3 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    define strafeLength = 0.05;
-    define strafePosition = 0;
-    StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-    while(EventPlayer().behavior == 3)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(-1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
-}
-
-rule: "BEHAVIOR: Crouch Strafe"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 4 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    define strafeLength = 0.2;
-    define strafePosition = 0;
-    StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-    while(EventPlayer().behavior == 4)
-    {
-        if (strafePosition >= strafeLength)
-        {
-            StopHoldingButton(EventPlayer(), Button.Crouch);
-            StartThrottleInDirection(EventPlayer(), Vector(-1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        else if (strafePosition <= -strafeLength)
-        {
-            StopHoldingButton(EventPlayer(), Button.Crouch);
-            StartThrottleInDirection(EventPlayer(), Vector(1,0,0), 1, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-        }
-        if (strafePosition > 0 - 0.03 && strafePosition < 0 + 0.03)
-        {
-            StartHoldingButton(EventPlayer(), Button.Crouch);
-        }
-        if(ThrottleOf(EventPlayer()) == Vector(1,0,0))
-        {
-            strafePosition += 0.016;
-        }
-        else if (ThrottleOf(EventPlayer()) == Vector(-1,0,0))
-        {
-            strafePosition -= 0.016;
-        }
-    }
-}
-
-rule: "BEHAVIOR: ORISA: Deploy Shield on Cooldown"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 201 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    while(EventPlayer().behavior == 201)
-    {
-        PressButton(EventPlayer(), Button.Ability2);
-        Wait(10);
-    }
-}
-
-rule: "BEHAVIOR: REINHARDT: Shield Up"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 301 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-}
-
-rule: "BEHAVIOR: SIGMA: Deploy Shield"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 501 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-    Wait(1.5);
-    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-}
-
-rule: "BEHAVIOR: WINSTON: Deploy Bubble"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 601 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    while(EventPlayer().behavior == 601)
-    {
-        PressButton(EventPlayer(), Button.Ability2);
-        Wait(13);
-    }
-}
-
-rule: "BEHAVIOR: HAMMOND: Ball"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 701 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    PressButton(EventPlayer(), Button.Ability1);
-}
-
-rule: "BEHAVIOR: ZARYA: Personal Bubble"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 801 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    while(EventPlayer().behavior == 801)
-    {
-        PressButton(EventPlayer(), Button.Ability1);
-        Wait(10);
-    }
-}
-
-rule: "BEHAVIOR: BASTION: Sentry"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 1001 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    PressButton(EventPlayer(), Button.Ability1);
-}
-
-rule: "BEHAVIOR: BRIGITTE: Shield"
-Event.OngoingPlayer
-if (EventPlayer().behavior == 2701 && IsDummyBot(EventPlayer()) && IsGameInProgress())
-{
-    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+    define bot;
+    bot = new Bot(
+        HeroOf(selectedPlayer), 
+        SlotOf(selectedPlayer), 
+        TeamOf(selectedPlayer), 
+        selectedPlayer.behavior, 
+        selectedPlayer.initialPosition, 
+        selectedPlayer.initialFacing
+    );
+    Append(savedBots, bot);
+    SmallMessage(EventPlayer(), <"Hero: <0> Saved", HeroOf(selectedPlayer)>);
 }
 
 rule: "FUNCTION: Destroy bot on death"
 Event.OngoingPlayer
-if (IsDead(EventPlayer()) && IsDummyBot(EventPlayer()))
+if (IsDead(EventPlayer()) 
+    && IsDummyBot(EventPlayer()))
 {
     DestroyDummyBot(TeamOf(EventPlayer()), SlotOf(EventPlayer()));
 }
@@ -661,6 +536,27 @@ class Mode
         allowAbilities = setAbilities;
     }
     
+}
+
+class Bot
+{
+    public define botHero;
+    public define botSlot;
+    public define botTeam;
+    public define botBehavior;
+    public define botInitialPosition;
+    public define botInitialFacing;
+
+    public Bot(define inHero, define inSlot, define inTeam, define inBehavior, define inPosition, define inFacing)
+    {
+        botHero = inHero;
+        botSlot = inSlot;
+        botTeam = inTeam;
+        botBehavior = inBehavior;
+        botInitialPosition = inPosition;
+        botInitialFacing = inFacing;
+    }
+
 }
 
 method toggleFlying(define player, define flying)
@@ -719,3 +615,4 @@ method disableAbilities(define player)
     DisallowButton(player, Button.Crouch);
 
 }
+

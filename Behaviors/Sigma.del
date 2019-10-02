@@ -1,0 +1,16 @@
+import "Behaviors.del";
+// SIGMA
+rule: "BEHAVIOR: SIGMA: Deploy Shield"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 501 
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    StartHoldingButton(EventPlayer(), Button.SecondaryFire);
+    Wait(1.5);
+    StopHoldingButton(EventPlayer(), Button.SecondaryFire);
+}

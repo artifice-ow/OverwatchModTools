@@ -1,0 +1,14 @@
+import "Behaviors.del";
+// BASTION
+rule: "BEHAVIOR: BASTION: Sentry"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 1001 
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    PressButton(EventPlayer(), Button.Ability1);
+}

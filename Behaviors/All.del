@@ -1,0 +1,90 @@
+/*
+* Overwatch Mod Tools
+* This file contains all the general behavior rules.
+*/
+import "Behaviors.del";
+
+// All Hero Behaviors
+rule: "BEHAVIOR: Stationary"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 0 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    resetBehaviors(EventPlayer());
+}
+
+rule: "BEHAVIOR: Strafe"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 1 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    StartStrafe(0.3);
+}
+
+rule: "BEHAVIOR: Long Strafe"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 2 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    StartStrafe(1);
+}
+
+rule: "BEHAVIOR: AD Spam"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 3 
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    StartStrafe(0.05);
+}
+
+rule: "BEHAVIOR: Crouch Strafe"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 4 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    StartCrouchStrafe(0.3);
+}
+
+rule: "BEHAVIOR: Long Crouch Strafe"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 5 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    StartCrouchStrafe(1);
+}
+
+rule: "BEHAVIOR: Track Closest Enemy"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 6
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    TrackClosestEnemy();
+}
+
+rule: "BEHAVIOR: Shoot Closest Enemy"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 7
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    TrackClosestEnemy();
+    StartShooting(EventPlayer());
+}
+
+rule: "BEHAVIOR: Strafe and Shoot"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 8
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    TrackClosestEnemy();
+    StartShooting(EventPlayer());
+    StartStrafe(0.3);
+}

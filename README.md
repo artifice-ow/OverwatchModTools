@@ -1,4 +1,4 @@
-# OverwatchModTools v1.0 - Y3R8A
+# OverwatchModTools v1.1 - DYK80
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes written in Overwatch Script to Workshop.
 
 There are 3 different modes:
@@ -28,11 +28,11 @@ Set Hero Facing | `Ability 1 + Secondary Fire`
 
 ## Build Heroes
 This mode is for changing the behavior of heroes  
-[List of Behaviors](BEHAVIORS.md)  
+[List of Behaviors](BEHAVIORS.md)
 
 | Action | Button Map |  
 |--------|------------|  
-Select Hero | `Primary Fire`  
+Select Hero | `Primary Fire`    
 Next Behavior | `Ability 2`  
 Prev Behavior | `Ultimate`  
 Set Behavior | `Ability 1 + Ultimate`  

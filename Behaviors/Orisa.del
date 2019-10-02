@@ -1,0 +1,18 @@
+import "Behaviors.del";
+// ORISA
+rule: "BEHAVIOR: ORISA: Deploy Shield on Cooldown"
+Event.OngoingPlayer
+if (
+    EventPlayer().behavior == 201 
+    && 
+    IsDummyBot(EventPlayer()) 
+    && 
+    IsGameInProgress()
+)
+{
+    while(EventPlayer().behavior == 201)
+    {
+        PressButton(EventPlayer(), Button.Ability2);
+        Wait(10);
+    }
+}

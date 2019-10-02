@@ -1,0 +1,306 @@
+// Player HUD Items
+define playervar modeMenu;
+define playervar pickHeroesMenu;
+define playervar buildHeroesMenu;
+define playervar selectedPlayerHeader;
+define playervar selectedPlayerPosition;
+define playervar selectedPlayerFacing;
+define playervar selectedPlayerHero;
+define playervar selectedPlayerTeam;
+define playervar selectedPlayerSlot;
+define playervar selectedPlayerBehavior;
+
+// Player Effect Items
+define playervar cursor;
+define playervar selectionMarker;
+define playervar fixerEffect;
+
+method CleanHUD()
+{
+    DestroyHudText(modeMenu);
+    DestroyHudText(pickHeroesMenu);
+    DestroyHudText(buildHeroesMenu);
+    DestroyHudText(selectedPlayerHeader);
+    DestroyHudText(selectedPlayerPosition);
+    DestroyHudText(selectedPlayerFacing);
+    DestroyHudText(selectedPlayerHero);
+    DestroyHudText(selectedPlayerTeam);
+    DestroyHudText(selectedPlayerSlot);
+    DestroyHudText(selectedPlayerBehavior);
+
+    DestroyEffect(cursor);
+    DestroyEffect(selectionMarker);
+    DestroyEffect(fixerEffect);
+}
+
+method CreateModeMenu(define index)
+{
+    if (index == 0)
+    {
+        CreateHudText(
+            EventPlayer(),
+            "Play", 
+            null, 
+            null, 
+            Location.Top, 
+            1, 
+            Color.White, 
+            Color.White, 
+            Color.White, 
+            StringRev.String, 
+            Spectators.VisibleNever
+        );
+    }
+    else if (index == 1)
+    {
+        CreateHudText(
+            EventPlayer(),
+            "Pick Heroes", 
+            null, 
+            null, 
+            Location.Top, 
+            1, 
+            Color.Blue, 
+            Color.White, 
+            Color.White, 
+            StringRev.String, 
+            Spectators.VisibleNever
+        );
+    }
+    else if (index == 2)
+    {
+        CreateHudText(
+            EventPlayer(),
+            "Build Heroes", 
+            null, 
+            null, 
+            Location.Top, 
+            1, 
+            Color.Orange, 
+            Color.White, 
+            Color.White, 
+            StringRev.String, 
+            Spectators.VisibleNever
+        );
+    }
+    else
+    {
+        CreateHudText(
+            EventPlayer(),
+            "Unknown Fault", 
+            null, 
+            null, 
+            Location.Top, 
+            1, 
+            Color.Red, 
+            Color.White, 
+            Color.White, 
+            StringRev.String, 
+            Spectators.VisibleNever
+        );
+    }
+    EventPlayer().modeMenu = LastTextID();
+}
+
+method CreatePickHeroMenu()
+{
+    CreateHudText(
+        EventPlayer(), 
+        HeroIconString(selectedHero), 
+        selectedTeam, 
+        selectedHero, 
+        Location.Top, 
+        2, 
+        Color.Blue, 
+        Color.Blue, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
+    EventPlayer().pickHeroesMenu = LastTextID();
+}
+
+method CreateBuildHeroMenu()
+{
+    CreateHudText(
+        EventPlayer(), 
+        HeroIconString(HeroOf(selectedPlayer)), 
+        "Selected Ability",
+        behaviors[behaviorIndex], 
+        Location.Top, 
+        2, 
+        Color.Orange, 
+        Color.Orange, 
+        Color.White, 
+        StringRev.String, 
+        Spectators.VisibleNever
+    );
+    EventPlayer().buildHeroesMenu = LastTextID();
+}
+
+method CreateBotInfoHUD()
+{
+    CreateHudText(
+        EventPlayer(),
+        <"Selected Player">,
+        null,
+        null,
+        Location.Left,
+        1,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerHeader = LastTextID();
+
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Position: <0>", selectedPlayer.initialPosition>,
+        Location.Left,
+        2,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerPosition = LastTextID();
+    
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Facing: <0>", selectedPlayer.initialFacing>,
+        Location.Left,
+        3,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerFacing = LastTextID();
+
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Hero: <0>", HeroOf(selectedPlayer)>,
+        Location.Left,
+        4,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+
+    EventPlayer().selectedPlayerHero = LastTextID();
+
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Team: <0>", TeamOf(selectedPlayer)>,
+        Location.Left,
+        5,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerTeam = LastTextID();
+
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Point: <0>", SlotOf(selectedPlayer)>,
+        Location.Left,
+        6,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerSlot = LastTextID();
+
+    CreateHudText(
+        EventPlayer(),
+        null,
+        null,
+        <"Ability: <0>", selectedPlayer.behavior>,
+        Location.Left,
+        7,
+        Color.Orange,
+        Color.White,
+        Color.White,
+        StringRev.String,
+        Spectators.VisibleNever
+    );
+    EventPlayer().selectedPlayerBehavior = LastTextID();
+}
+
+method CreateCursor(define index2)
+{
+    if (index2 == 1)
+    {
+        CreateEffect(
+            EventPlayer(),
+            Effect.Ring, 
+            Color.Blue, 
+            EventPlayer().hitPosition,
+            1, 
+            EffectRev.PositionAndRadius
+        );
+        EventPlayer().cursor = LastCreatedEntity();
+    } else if (index2 == 2)
+    {
+        CreateEffect(
+            EventPlayer(),
+            Effect.Ring, 
+            Color.Orange, 
+            EventPlayer().hitPosition,
+            1, 
+            EffectRev.PositionAndRadius
+        );
+        EventPlayer().cursor = LastCreatedEntity();
+    }
+    
+}
+
+method CreateSelectionMarker()
+{
+    CreateEffect(
+        EventPlayer(), 
+        Effect.Ring, 
+        Color.Green, 
+        EventPlayer().selectedPlayer, 
+        1.5, 
+        EffectRev.PositionAndRadius
+    );
+    EventPlayer().selectionMarker = LastCreatedEntity();
+}
+
+method FixEffects()
+{
+    // Fixes bug where 1 element isn't rendered on first mode switch
+    if (fixerEffect == 0 || fixerEffect == null)
+    {
+        CreateEffect(
+            EventPlayer(), 
+            Effect.Orb, 
+            Color.Blue, 
+            EventPlayer().hitPosition, 
+            1, 
+            EffectRev.PositionAndRadius
+        );
+        EventPlayer().fixerEffect = LastCreatedEntity();
+    }
+}

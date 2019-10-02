@@ -1,0 +1,26 @@
+method resetBehaviors(define player)
+{
+    StopHoldingButton(player, Button.PrimaryFire);
+    StopHoldingButton(player, Button.SecondaryFire);
+    StopHoldingButton(player, Button.Interact);
+    StopHoldingButton(player, Button.Ability1);
+    StopHoldingButton(player, Button.Ability2);
+    StopHoldingButton(player, Button.Ultimate);
+    StopHoldingButton(player, Button.Crouch);
+    StopHoldingButton(player, Button.Jump);
+
+    StopAccelerating(player);
+    StopThrottleInDirection(player);
+    StopForcingThrottle(player);
+    StopFacing(player);
+
+    StopTransformingThrottle(player);
+
+    Teleport(player, player.initialPosition);
+
+    if (HeroOf(player) == Hero.Bastion
+        && IsUsingAbility2(player))
+    {
+        PressButton(player, Button.Ability2);
+    }
+}

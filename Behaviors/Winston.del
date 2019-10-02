@@ -1,0 +1,14 @@
+import "Behaviors.del";
+// WINSTON
+rule: "BEHAVIOR: WINSTON: Deploy Bubble"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 601 
+    && IsDummyBot(EventPlayer())
+    && IsGameInProgress())
+{
+    while(EventPlayer().behavior == 601)
+    {
+        PressButton(EventPlayer(), Button.Ability2);
+        Wait(13);
+    }
+}
