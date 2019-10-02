@@ -15,4 +15,12 @@ method resetBehaviors(define player)
     StopFacing(player);
 
     StopTransformingThrottle(player);
+
+    Teleport(player, player.initialPosition);
+
+    if (HeroOf(player) == Hero.Bastion
+        && IsUsingAbility2(player))
+    {
+        PressButton(player, Button.Ability2);
+    }
 }

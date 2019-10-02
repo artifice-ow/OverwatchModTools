@@ -1,4 +1,4 @@
-# OverwatchModTools v1.0 - Y3R8A
+# OverwatchModTools v1.1 - DYK80
 An Overwatch workshop mode for creating bots, showing team comps, and creating custom practice modes written in Overwatch Script to Workshop.
 
 There are 3 different modes:

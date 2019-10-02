@@ -45,6 +45,8 @@ define globalvar cameraSmoothing;
 
 define globalvar savedBots;
 
+define globalvar map;
+
 // Player Variables
 define playervar mode;
 define playervar isFlying;
@@ -129,6 +131,7 @@ Event.OngoingGlobal
         2,
         3,
         4,
+        5,
         6,
         7,
         8,
@@ -142,6 +145,8 @@ Event.OngoingGlobal
         1101,
         2701
     ];
+
+    map = GetMap();
 }
 
 rule: "SETUP: Set player properties"
@@ -172,9 +177,17 @@ if (IsInSetup())
     SetMatchTime(0);
 }
 
+rule: "SETUP: Remove Scoring"
+Event.OngoingGlobal
+if (IsGameInProgress())
+{
+    DisableScoring();
+}
+
 rule: "FUNCTION: Switch Mode"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
+if (IsButtonHeld(EventPlayer(), Button.Interact) 
+    && IsGameInProgress())
 {
     define prevmode;
     prevmode = EventPlayer().mode;
@@ -219,7 +232,8 @@ if (IsButtonHeld(EventPlayer(), Button.Interact) && IsGameInProgress())
 
 rule: "MODE: Play Mode"
 Event.OngoingPlayer
-if (EventPlayer().mode == 0 && IsGameInProgress())
+if (EventPlayer().mode == 0 
+    && IsGameInProgress())
 {
     CleanHUD();
     Wait(0.25);
@@ -228,7 +242,8 @@ if (EventPlayer().mode == 0 && IsGameInProgress())
 
 rule: "MODE: Pick Heroes"
 Event.OngoingPlayer
-if (EventPlayer().mode == 1 && IsGameInProgress())
+if (EventPlayer().mode == 1 
+    && IsGameInProgress())
 {
     CleanHUD();
     Wait(0.025);
@@ -242,7 +257,8 @@ if (EventPlayer().mode == 1 && IsGameInProgress())
 
 rule: "MODE: Build Heroes"
 Event.OngoingPlayer
-if (EventPlayer().mode == 2 && IsGameInProgress())
+if (EventPlayer().mode == 2 
+    && IsGameInProgress())
 {
     CleanHUD();
     Wait(0.025);
@@ -256,7 +272,8 @@ if (EventPlayer().mode == 2 && IsGameInProgress())
 
 rule: "FUNCTION: Fly"
 Event.OngoingPlayer
-if (EventPlayer().isFlying && IsGameInProgress())
+if (EventPlayer().isFlying 
+    && IsGameInProgress())
 {
     while (EventPlayer().isFlying)
     {
@@ -269,7 +286,10 @@ if (EventPlayer().isFlying && IsGameInProgress())
 
 rule: "PICK HEROES: Cycle Heroes - Forward"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ability2) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (heroIndex >= CountOf(heroes) - 1)
     {
@@ -284,7 +304,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2) && IsGameInProgress() && !IsBut
 
 rule: "PICK HEROES: Cycle Heroes - Back"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 1)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 1)
 {
     if (heroIndex <= 0)
     {
@@ -341,6 +364,7 @@ if (IsButtonHeld(EventPlayer(), Button.SecondaryFire)
     && EventPlayer().mode == 1)
 {
     Teleport(EventPlayer().selectedPlayer, hitPosition);
+    Wait(0.05);
     selectedPlayer.initialPosition = PositionOf(selectedPlayer);
 }
 
@@ -418,7 +442,8 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2)
     {
         behaviorIndex++;
     }
-    while(RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != 0 && RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != IndexOfArrayValue(heroes, HeroOf(EventPlayer().selectedPlayer)) + 1)
+    while(RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != 0 
+        && RoundToInteger(behaviors[behaviorIndex]/100, Rounding.Down) != IndexOfArrayValue(heroes, HeroOf(EventPlayer().selectedPlayer)) + 1)
     {
         if (behaviorIndex >= CountOf(behaviors) - 1)
         {
@@ -434,7 +459,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ability2)
 
 rule: "BUILD HEROES: Cycle Behaviors - Back"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsButtonHeld(EventPlayer(), Button.Ability1) && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsGameInProgress() 
+    && !IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && EventPlayer().mode == 2)
 {
     if (behaviorIndex <= 0)
     {
@@ -459,7 +487,10 @@ if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsGameInProgress() && !IsBut
 
 rule: "BUILD HEROES: Apply Behavior"
 Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Ultimate) && IsButtonHeld(EventPlayer(), Button.Ability1) && IsGameInProgress() && EventPlayer().mode == 2)
+if (IsButtonHeld(EventPlayer(), Button.Ultimate) 
+    && IsButtonHeld(EventPlayer(), Button.Ability1) 
+    && IsGameInProgress() 
+    && EventPlayer().mode == 2)
 {
     PlayEffect(EventPlayer(), PlayEffect.GoodPickupEffect, Color.SkyBlue, selectedPlayer, 1);
     resetBehaviors(selectedPlayer);

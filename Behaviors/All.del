@@ -50,6 +50,15 @@ if (EventPlayer().behavior == 4
     StartCrouchStrafe(0.3);
 }
 
+rule: "BEHAVIOR: Long Crouch Strafe"
+Event.OngoingPlayer
+if (EventPlayer().behavior == 5 
+    && IsDummyBot(EventPlayer()) 
+    && IsGameInProgress())
+{
+    StartCrouchStrafe(1);
+}
+
 rule: "BEHAVIOR: Track Closest Enemy"
 Event.OngoingPlayer
 if (EventPlayer().behavior == 6
