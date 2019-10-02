@@ -14,6 +14,7 @@ No special abilities, just you and your hero
 
 ## Pick Heroes
 This mode is for adding heroes to the map and moving them around.  
+
 | Action | Button Map |
 |--------|------------|
 Select Hero | `Primary Fire`  
